@@ -56,10 +56,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 .orb-anchor .orb-space{pointer-events:auto}
 
 /* ===== ORB — Living Entity System ===== */
-.orb-space{position:relative;width:220px;height:220px;flex-shrink:0;overflow:hidden;border-radius:50%}
-/* Hide Google One Tap popup overlay */
-#credential_picker_container,.S9gUrf-YoZ4jf,iframe[src*="accounts.google.com"]{
-  position:fixed!important;top:0!important;right:0!important;z-index:1000!important}
+.orb-space{position:relative;width:220px;height:220px;flex-shrink:0}
 .orb-core{position:absolute;top:50%;left:50%;width:160px;height:160px;
   transform:translate(-50%,-50%);border-radius:50%;
   background:radial-gradient(circle at 38% 32%,
@@ -1520,11 +1517,11 @@ function getClosingSuggestText(){
   const c = userCtx.concern;
   // Actionable suggestions — 大叔經驗談 tone, not therapist advice
   const suggests = {
-    ai: '明天上班的時候，花 15 分鐘用 AI 做一件你本來要花一小時做的事。不是為了追趨勢——是為了讓你自己感受到「原來我可以駕馭這玩意」。焦慮變成掌控感，只需要一次成功經驗。',
-    career: '這週找一個你覺得「還不錯」的前輩，約他喝杯咖啡。不是要他指路——是看看另一種活法。有時候出路不是想出來的，是看到的。',
-    burnout: '今天晚上回去，做一件事：把手機放在客廳，不帶進臥室。就這一件事。不是要你斷網——是讓你的大腦知道「睡覺的地方不用工作」。小事，但會有感覺。',
-    meaning: '從明天開始，每天注意一件讓你覺得「欸，這個不討厭」的事。不用分析，不用行動，就注意。累積兩週之後，你會看到一個自己都沒察覺的模式。',
-    chat: '找一天，跟一個你信任的人說：「最近有點悶，沒什麼大事，就想聊。」不用等對方解決問題——光是說出來，就已經在解決了。'
+    ai: '明天花 15 分鐘用 AI 做一件你本來要花一小時做的事。不是為了追趨勢——是讓你感受到「我能駕馭這玩意」。2026 的焦慮解藥不是學更多，是做一次成功的小事。',
+    career: '這週找一個你覺得活得還不錯的人，約他喝杯咖啡。不是要他給你方向——是看看 2026 還有什麼別的活法。出路不是想出來的，是看到的。',
+    burnout: '今晚回去，把手機放客廳，不帶進臥室。就這一件事。不是叫你數位排毒——是讓你的大腦知道「躺下來不用再工作了」。很小的事，但你的身體會記住。',
+    meaning: '從明天開始，注意一件讓你覺得「欸，這個不討厭」的事。不用分析、不用行動計畫。兩週後你會看到一個自己都沒察覺的模式——那就是線索。',
+    chat: '找一天，跟一個你信任的人說：「最近有點悶，沒什麼大事，就想聊。」2026 的大叔最缺的不是建議，是有人聽。光說出來就已經在解決了。'
   };
   return suggests[c] || '今天回去早點睡。認真的。有些問題睡一覺之後會長得不太一樣。';
 }
@@ -1541,19 +1538,19 @@ function getTakeawayText(){
   const pool = {
     ai: {
       low: [
-        '今天光是面對「被取代」這個念頭，就已經比大多數人勇敢了。',
-        'AI 不會焦慮、不會失眠——但也不會在低潮的時候還硬撐著上班。你會，這就是你的價值。',
-        '累的時候不用想 AI 的事。先顧好自己，機器不會替你活。'
+        '2026 很難。但光是面對「被取代」這個念頭，你就已經比大多數逃避的人勇敢了。',
+        'AI 不會焦慮、不會失眠——但也不會在低潮的時候還硬撐著上班。你會。這就是你的價值。',
+        '累的時候不用想 AI 的事。先顧好自己，機器不會替你活，也不會替你休息。'
       ],
       mid: [
-        '你不需要跑得比 AI 快，你只需要做 AI 做不到的事——帶著恐懼往前走。',
-        'AI 會取代任務，但取代不了一個願意在深夜反省自己的人。',
-        '焦慮代表你還在乎。不在乎的人早就開啟自動駕駛了。'
+        '你不需要跑得比 AI 快。2026 的生存法則是——做 AI 做不到的事：帶著恐懼往前走。',
+        'AI 取代的是任務，不是你這個人。願意在深夜反省自己的大叔，取代不了。',
+        '焦慮代表你還在乎。不在乎的人早就開自動駕駛了。你還清醒，這就是武器。'
       ],
       high: [
-        '今天狀態不錯——帶著這個能量，明天試著用 AI 搞定一件小事。掌控感是最好的解藥。',
-        '能笑著面對 AI 焦慮的大叔，已經比那些嘴上說不怕的人強了。',
-        '你的經驗 + AI 的效率 = 年輕人追不上的組合技。記住這個公式。'
+        '狀態不錯——帶著這個能量，明天用 AI 搞定一件小事。掌控感是 2026 最好的解藥。',
+        '能笑著面對 AI 焦慮的大叔，基本上已經無敵了。',
+        '你的經驗 + AI 的效率 = 年輕人追不上的組合技。2026 的贏家就長這樣。'
       ]
     },
     career: {
@@ -1717,7 +1714,7 @@ function buildConversationTree(){
       allowFree: true
     },
     validate1: {
-      text: '因為你不是特例。這年頭，光是在 LINE 群組裡回「收到」就很累了——你身邊一堆人也在裝沒事，只是大家演技都有金馬獎水準。',
+      text: '因為你不是特例。2026 了，連在 LINE 群組回「收到」都嫌累——你身邊一堆人也在裝沒事，只是大家演技都有金馬獎水準。但至少在這裡不用演。反正我又不是你主管。',
       mood: 'warmth',
       status: '同頻中',
       delay: 1800,
@@ -1767,7 +1764,7 @@ function buildConversationTree(){
       ]
     },
     dig1_social: {
-      text: '尤其是台灣男的。我們從小就被設定成「男人流血不流淚」，結果長大之後流的都是內傷。你上次跟誰說真話是什麼時候？不是那種「還好啊哈哈」的敷衍。',
+      text: '尤其是台灣大叔。從小被設定成「男人就是要撐」，2026 了這套還在——只是現在不只要撐，還要假裝很會用 AI、假裝不焦慮、假裝一切都在掌控中。你上次跟誰說真話？不是那種「還好啊哈哈」的。',
       mood: 'warmth',
       status: '靠近中',
       delay: 2000,
@@ -1834,7 +1831,7 @@ function buildConversationTree(){
       ]
     },
     ai_learn: {
-      text: '今天學 Prompt Engineering，明天學 AI Agent，後天又冒出個新框架——你的瀏覽器書籤比你家衣櫃還亂。你焦慮的可能不是「不知道學什麼」，而是「怕學了也是白學」。就像健身房會費一直扣，但你只去了兩次——對吧？',
+      text: '今天學 Claude，明天學 AI Agent，後天又冒出個新框架——你的瀏覽器書籤比你家衣櫃還亂。你焦慮的可能不是「不知道學什麼」，而是「怕學了下禮拜就過時」。就像健身房會費一直扣，但你只去了兩次——對吧？',
       mood: 'thinking',
       status: '在想',
       delay: 2000,
@@ -1854,7 +1851,7 @@ function buildConversationTree(){
       ]
     },
     ai_core: {
-      text: '跟你說句不中聽的：AI 確實會搶掉很多事。但它做不到的是——半夜三點焦慮到睡不著，然後隔天早上還能爬起來繼續幹。那叫韌性，那叫做人。你現在敢跑來這裡面對自己的焦慮，這件事 ChatGPT 就做不到。',
+      text: '跟你說句不中聽的：AI 確實會搶掉很多事，而且 2026 的速度比你想的快。但它做不到的是——半夜三點焦慮到睡不著，然後隔天早上還能爬起來繼續幹。那叫韌性，那叫做人。你現在敢面對這件事，這就是 AI 做不到的。',
       mood: 'warmth',
       status: '認真的',
       delay: 2500,
@@ -2177,7 +2174,7 @@ function buildConversationTree(){
       allowFree: true
     },
     chat_vague: {
-      text: '說不清楚的悶最難受——Google 搜「為什麼我不開心」，出來的結果不是賣你書就是叫你運動。但你的悶不是一篇文章能解決的。不用急著定義它，今天就讓它在這裡待一下就好。',
+      text: '說不清楚的悶最難受——Google 搜「為什麼我不開心」，出來的不是賣你線上課就是叫你冥想。但你的悶不是一篇文章或一個 app 能解決的。不用定義它，今天就讓它在這裡待一下。',
       mood: 'empathy',
       status: '陪著',
       delay: 2000,
