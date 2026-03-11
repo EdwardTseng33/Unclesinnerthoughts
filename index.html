@@ -669,7 +669,21 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 /* ===== TYPING INDICATOR (hidden — orb animation is sufficient) ===== */
 .typing-dots{display:none}
 
+/* ===== AUTH / AVATAR ===== */
+.user-avatar-bar{display:none;align-items:center;gap:10px;margin-bottom:1rem;
+  padding:0.5rem 1rem;border-radius:20px;background:hsla(0,0%,100%,0.06);
+  border:1px solid hsla(0,0%,100%,0.08)}
+.user-avatar-bar.visible{display:flex}
+.user-avatar-bar img{width:32px;height:32px;border-radius:50%;border:1px solid hsla(0,0%,100%,0.15)}
+.user-avatar-bar span{font-size:0.82rem;color:var(--text-soft)}
+.welcome-back-msg{font-size:0.88rem;color:var(--text-soft);margin-bottom:0.5rem;opacity:0;
+  transition:opacity 0.8s ease}
+.welcome-back-msg.visible{opacity:1}
+.logout-link{font-size:0.72rem;color:var(--text-ghost);cursor:pointer;margin-top:0.5rem;
+  text-decoration:underline;text-underline-offset:3px;transition:color 0.3s}
+.logout-link:hover{color:var(--text-soft)}
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <div class="universe" id="app">
@@ -690,19 +704,25 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 
   <!-- SPLASH -->
   <div class="scene active" id="splash">
+    <div class="user-avatar-bar" id="userAvatarBar">
+      <img id="userAvatarImg" src="" alt="">
+      <span id="userAvatarName"></span>
+    </div>
     <div class="splash-title">大叔心聲</div>
-    <div class="splash-sub">不叫你加油、不給你雞湯<br>就一個不會已讀你的地方</div>
-    <div class="splash-tagline">
+    <div class="welcome-back-msg" id="welcomeBackMsg"></div>
+    <div class="splash-sub" id="splashSub">不叫你加油、不給你雞湯<br>就一個不會已讀你的地方</div>
+    <div class="splash-tagline" id="splashTagline">
       <div class="tag-item"><div class="tag-icon">🥃</div><div class="tag-label">匿名暢聊</div></div>
       <div class="tag-item"><div class="tag-icon">🌙</div><div class="tag-label">半夜也行</div></div>
       <div class="tag-item"><div class="tag-icon">🧊</div><div class="tag-label">不是諮商</div></div>
     </div>
-    <button class="enter-btn" onclick="enterSpace()">進來坐</button>
-    <div class="privacy-note">🔒 不留紀錄｜老婆不會知道</div>
+    <button class="enter-btn" id="enterBtn" onclick="enterSpace()">進來坐</button>
+    <div class="privacy-note" id="privacyNote">🔒 不留紀錄｜老婆不會知道</div>
     <button class="google-login-btn" id="googleLoginBtn" onclick="handleGoogleLogin()">
       <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.99 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09A6.99 6.99 0 0 1 5.46 12c0-.72.12-1.43.35-2.09V7.07H2.18A11.97 11.97 0 0 0 0 12c0 1.94.46 3.77 1.28 5.39l3.56-2.84.01-.46z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       <span>用 Google 登入，記住你的旅程</span>
     </button>
+    <div class="logout-link" id="logoutLink" style="display:none" onclick="handleLogout()">登出</div>
   </div>
 
   <!-- CONTEXT -->
@@ -1189,8 +1209,18 @@ function showScene(id){
   document.getElementById(id).classList.add('active');
 }
 
-// ===== SPLASH → CONTEXT =====
+// ===== SPLASH → CONTEXT (or skip if returning) =====
 function enterSpace(){
+  if(isReturningUser && userCtx.concern){
+    // Returning user: skip context steps, go straight to chat
+    showScene('companion');
+    sessionActive = true;
+    buildConversationTree();
+    setMood('listening');
+    startSessionTimer();
+    setTimeout(() => navigateTo('opening'), 800);
+    return;
+  }
   showScene('context');
   startContext();
 }
@@ -1399,6 +1429,8 @@ function triggerHeartbeat(){
 }
 
 function beginCompanionSession(){
+  // Save profile if logged in (first time completing context)
+  saveUserProfile();
   showScene('companion');
   sessionActive = true;
   buildConversationTree();
@@ -2608,17 +2640,146 @@ function restartSession(){
   setMood('neutral');
 }
 
-// ===== GOOGLE LOGIN (POC — localStorage persistence) =====
-function handleGoogleLogin(){
-  // In production: use Google Identity Services / Firebase Auth
-  // POC: simulate login state with localStorage
-  const btn = document.getElementById('googleLoginBtn');
-  btn.innerHTML = '<span style="color:var(--text-soft)">✓ 記憶模式已開啟</span>';
-  btn.style.borderColor = 'hsla(var(--orb-h),50%,60%,0.3)';
-  btn.style.pointerEvents = 'none';
-  // Save session flag
-  try { localStorage.setItem('dashu_remember', 'true'); } catch(e){}
+// ===== GOOGLE AUTH (GSI + localStorage persistence) =====
+const GOOGLE_CLIENT_ID = 'PASTE_YOUR_CLIENT_ID_HERE';
+let currentUser = null;
+let isReturningUser = false;
+
+function decodeJwt(token){
+  const b = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+  return JSON.parse(decodeURIComponent(atob(b).split('').map(c =>
+    '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
 }
+
+function initGoogleAuth(){
+  if(typeof google === 'undefined' || !google.accounts) return;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: onGoogleCredential,
+    auto_select: true
+  });
+}
+
+function handleGoogleLogin(){
+  if(typeof google === 'undefined' || !google.accounts){
+    alert('Google 登入載入中，請稍後再試');
+    return;
+  }
+  google.accounts.id.prompt((n) => {
+    if(n.isNotDisplayed() || n.isSkippedMoment()){
+      // Fallback: use popup
+      google.accounts.id.prompt();
+    }
+  });
+}
+
+function onGoogleCredential(response){
+  const p = decodeJwt(response.credential);
+  currentUser = { id:p.sub, name:p.name, email:p.email, avatar:p.picture };
+  try{ localStorage.setItem('dashu_user', JSON.stringify(currentUser)); }catch(e){}
+
+  // Check if returning user with saved profile
+  const saved = loadUserProfile();
+  if(saved){
+    isReturningUser = true;
+    userCtx = saved.ctx;
+    showReturningUI();
+  } else {
+    showLoggedInUI();
+  }
+}
+
+function loadUserProfile(){
+  if(!currentUser) return null;
+  try{
+    const raw = localStorage.getItem('dashu_profile_' + currentUser.id);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+
+function saveUserProfile(){
+  if(!currentUser) return;
+  try{
+    localStorage.setItem('dashu_profile_' + currentUser.id, JSON.stringify({
+      ctx: userCtx,
+      lastVisit: Date.now()
+    }));
+  }catch(e){}
+}
+
+function showLoggedInUI(){
+  // First-time login: show avatar, hide login button
+  const bar = document.getElementById('userAvatarBar');
+  const img = document.getElementById('userAvatarImg');
+  const nameEl = document.getElementById('userAvatarName');
+  img.src = currentUser.avatar || '';
+  nameEl.textContent = currentUser.name;
+  bar.classList.add('visible');
+  document.getElementById('googleLoginBtn').style.display = 'none';
+  document.getElementById('logoutLink').style.display = 'block';
+  document.getElementById('privacyNote').innerHTML = '🔒 資料存在你的瀏覽器｜只有你看得到';
+}
+
+function showReturningUI(){
+  showLoggedInUI();
+  // Welcome back message
+  const firstName = currentUser.name.split(' ')[0] || '大叔';
+  const msgs = [
+    firstName + '，又來啦。',
+    '嘿 ' + firstName + '，想你了。',
+    firstName + '，歡迎回來坐坐。',
+    '喲，' + firstName + ' 今天也辛苦了。'
+  ];
+  const wb = document.getElementById('welcomeBackMsg');
+  wb.textContent = pick(msgs);
+  setTimeout(() => wb.classList.add('visible'), 300);
+
+  // Change button text
+  document.getElementById('enterBtn').textContent = '繼續聊';
+  // Hide tagline for cleaner look
+  document.getElementById('splashSub').style.display = 'none';
+}
+
+function handleLogout(){
+  currentUser = null;
+  isReturningUser = false;
+  try{
+    localStorage.removeItem('dashu_user');
+    // Keep profile data in case they log back in
+  }catch(e){}
+  if(typeof google !== 'undefined' && google.accounts){
+    google.accounts.id.disableAutoSelect();
+  }
+  // Reset UI
+  document.getElementById('userAvatarBar').classList.remove('visible');
+  document.getElementById('welcomeBackMsg').classList.remove('visible');
+  document.getElementById('googleLoginBtn').style.display = 'flex';
+  document.getElementById('logoutLink').style.display = 'none';
+  document.getElementById('enterBtn').textContent = '進來坐';
+  document.getElementById('splashSub').style.display = '';
+  document.getElementById('privacyNote').innerHTML = '🔒 不留紀錄｜老婆不會知道';
+}
+
+// On page load: restore session from localStorage
+function restoreSession(){
+  try{
+    const raw = localStorage.getItem('dashu_user');
+    if(raw){
+      currentUser = JSON.parse(raw);
+      const saved = loadUserProfile();
+      if(saved){
+        isReturningUser = true;
+        userCtx = saved.ctx;
+        showReturningUI();
+      } else {
+        showLoggedInUI();
+      }
+    }
+  }catch(e){}
+  // Init GSI (may auto-select if session exists)
+  setTimeout(() => initGoogleAuth(), 500);
+}
+restoreSession();
 </script>
 </body>
 </html>
