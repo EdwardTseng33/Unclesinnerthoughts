@@ -1,0 +1,2077 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>大叔心聲</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-h:225;--bg-s:25%;--bg-l:5%;
+  --orb-h:228;--orb-s:75%;--orb-l:65%;
+  --accent-h:228;--accent-s:90%;--accent-l:72%;
+  --warm-h:32;--warm-s:85%;--warm-l:70%;
+  --calm-h:174;--calm-s:55%;--calm-l:62%;
+  --text-main:rgba(232,235,245,0.93);
+  --text-soft:rgba(168,174,196,0.88);
+  --text-ghost:rgba(108,114,142,0.75);
+}
+html,body{width:100%;height:100%;overflow:hidden;
+  font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#0a0b10;color:var(--text-main)}
+.universe{width:100%;height:100%;position:relative;overflow:hidden;
+  max-width:430px;margin:0 auto}
+@media(min-width:500px){body{background:#050508}.universe{border-left:1px solid rgba(255,255,255,0.03);border-right:1px solid rgba(255,255,255,0.03)}}
+canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
+
+/* ===== GRADIENT ATMOSPHERE ===== */
+.atmosphere{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;
+  transition:all 2.5s cubic-bezier(0.4,0,0.2,1)}
+.atmo-top{position:absolute;top:0;left:0;width:100%;height:50%;
+  background:radial-gradient(ellipse at 50% 0%,hsla(var(--orb-h),40%,20%,0.25) 0%,transparent 70%);
+  transition:all 2.5s}
+.atmo-center{position:absolute;top:25%;left:50%;width:300px;height:300px;transform:translate(-50%,-15%);
+  background:radial-gradient(circle,hsla(var(--orb-h),50%,30%,0.12) 0%,transparent 70%);
+  border-radius:50%;filter:blur(40px);transition:all 2.5s}
+.atmo-bottom{position:absolute;bottom:0;left:0;width:100%;height:40%;
+  background:linear-gradient(to top,hsla(var(--bg-h),30%,4%,0.9) 0%,transparent 100%)}
+
+/* ===== SCENES ===== */
+.scene{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;
+  padding-top:calc(12vh + 220px);
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  opacity:0;pointer-events:none;transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1)}
+.scene.active{opacity:1;pointer-events:auto}
+.scene::-webkit-scrollbar{display:none}
+
+/* ===== PERSISTENT ORB ANCHOR (fixed position across all scenes) ===== */
+.orb-anchor{
+  position:absolute;top:12vh;left:50%;transform:translateX(-50%);
+  z-index:3;pointer-events:none;
+  transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1)}
+.orb-anchor .orb-space{pointer-events:auto}
+
+/* ===== ORB ===== */
+.orb-space{position:relative;width:220px;height:220px;flex-shrink:0}
+.orb-core{position:absolute;top:50%;left:50%;width:160px;height:160px;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,
+    hsla(var(--orb-h),80%,78%,0.95),
+    hsla(var(--orb-h),70%,55%,0.7),
+    hsla(calc(var(--orb-h) - 40),50%,45%,0.4));
+  box-shadow:
+    0 0 60px hsla(var(--orb-h),80%,65%,0.35),
+    0 0 120px hsla(var(--orb-h),60%,50%,0.15),
+    inset 0 0 50px rgba(255,255,255,0.12);
+  animation:orbBreathe 5s ease-in-out infinite;
+  transition:all 2s cubic-bezier(0.4,0,0.2,1)}
+.orb-glow{position:absolute;top:50%;left:50%;width:200px;height:200px;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,hsla(var(--orb-h),70%,65%,0.15) 0%,transparent 70%);
+  animation:glowPulse 4s ease-in-out infinite alternate;
+  transition:all 2s}
+.orb-ring1{position:absolute;top:50%;left:50%;width:190px;height:190px;
+  transform:translate(-50%,-50%);border-radius:50%;
+  border:1px solid hsla(var(--orb-h),60%,70%,0.12);
+  animation:ringDrift 10s linear infinite}
+.orb-ring2{position:absolute;top:50%;left:50%;width:215px;height:215px;
+  transform:translate(-50%,-50%);border-radius:50%;
+  border:1px solid hsla(var(--orb-h),40%,60%,0.06);
+  animation:ringDrift 15s linear infinite reverse}
+
+@keyframes orbBreathe{
+  0%,100%{transform:translate(-50%,-50%) scale(1) translateY(0)}
+  30%{transform:translate(-50%,-50%) scale(1.03) translateY(-6px)}
+  60%{transform:translate(-50%,-50%) scale(0.98) translateY(2px)}
+}
+@keyframes glowPulse{0%{opacity:0.6;transform:translate(-50%,-50%) scale(1)}100%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
+@keyframes ringDrift{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+/* Orb mood states */
+.orb-core.listening{animation:orbBreathe 5s ease-in-out infinite, orbListenGlow 2s ease-in-out infinite alternate}
+.orb-core.thinking{animation:orbThink 2s ease-in-out infinite}
+.orb-core.empathy{animation:orbBreathe 6s ease-in-out infinite}
+.orb-core.warmth{animation:orbBreathe 5s ease-in-out infinite}
+@keyframes orbListenGlow{0%{box-shadow:0 0 60px hsla(var(--orb-h),80%,65%,0.35),0 0 120px hsla(var(--orb-h),60%,50%,0.15),inset 0 0 50px rgba(255,255,255,0.12)}100%{box-shadow:0 0 80px hsla(var(--orb-h),80%,65%,0.5),0 0 150px hsla(var(--orb-h),60%,50%,0.2),inset 0 0 50px rgba(255,255,255,0.15)}}
+@keyframes orbThink{0%,100%{transform:translate(-50%,-50%) scale(1)}25%{transform:translate(-50%,-50%) scale(0.96)}75%{transform:translate(-50%,-50%) scale(1.04)}}
+
+/* ===== FLOATING TEXT ===== */
+.voice-area{position:absolute;width:100%;padding:0 2rem;text-align:center;
+  transition:all 0.8s cubic-bezier(0.4,0,0.2,1)}
+.voice-text{font-size:1.15rem;line-height:1.9;font-weight:300;letter-spacing:0.02em;
+  color:var(--text-main);opacity:0;transform:translateY(15px);
+  transition:all 0.8s cubic-bezier(0.4,0,0.2,1);max-width:360px;margin:0 auto}
+.voice-text.visible{opacity:1;transform:translateY(0)}
+.voice-text.fading{opacity:0;transform:translateY(-10px)}
+
+/* ===== ORBITAL CHOICES ===== */
+.choices-ring{position:relative;width:100%;max-width:380px;min-height:60px;
+  display:flex;flex-direction:column;gap:10px;padding:0 1.5rem;
+  opacity:0;transform:translateY(20px);
+  transition:all 0.6s cubic-bezier(0.4,0,0.2,1)}
+.choices-ring.visible{opacity:1;transform:translateY(0)}
+
+.choice-pill{
+  padding:0.85rem 1.4rem;
+  background:hsla(var(--orb-h),25%,18%,0.4);
+  border:1px solid hsla(var(--orb-h),35%,45%,0.12);
+  border-radius:24px;
+  color:hsla(var(--orb-h),50%,82%,0.9);
+  font-size:1rem;font-weight:400;font-family:inherit;letter-spacing:0.01em;
+  cursor:pointer;transition:all 0.35s;text-align:center;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.choice-pill:hover{
+  background:hsla(var(--orb-h),40%,30%,0.5);
+  border-color:hsla(var(--orb-h),60%,65%,0.35);
+  transform:translateY(-2px);
+  box-shadow:0 4px 20px hsla(var(--orb-h),60%,50%,0.15)}
+.choice-pill:active{transform:translateY(0);transition:all 0.1s}
+
+/* ===== FREE TEXT INPUT ===== */
+.whisper-input{position:absolute;bottom:0;left:0;width:100%;padding:1rem 1.5rem 2rem;
+  opacity:0;pointer-events:none;transform:translateY(20px);
+  transition:all 0.5s cubic-bezier(0.4,0,0.2,1);z-index:10;
+  background:linear-gradient(to top,hsla(var(--bg-h),30%,5%,0.95) 60%,transparent 100%)}
+.whisper-input.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+.whisper-row{display:flex;gap:8px;align-items:center}
+.whisper-field{flex:1;padding:0.85rem 1.2rem;
+  background:hsla(var(--orb-h),20%,15%,0.5);
+  border:1px solid hsla(var(--orb-h),30%,40%,0.2);
+  border-radius:24px;color:var(--text-main);font-size:1rem;font-family:inherit;
+  outline:none;transition:all 0.3s;backdrop-filter:blur(8px)}
+.whisper-field::placeholder{color:var(--text-ghost)}
+.whisper-field:focus{border-color:hsla(var(--orb-h),50%,60%,0.4);
+  box-shadow:0 0 20px hsla(var(--orb-h),50%,50%,0.1)}
+.whisper-send{width:40px;height:40px;border-radius:50%;border:none;
+  background:hsla(var(--orb-h),60%,55%,0.3);color:var(--text-main);
+  font-size:1.1rem;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center}
+.whisper-send:hover{background:hsla(var(--orb-h),60%,55%,0.5)}
+
+/* ===== SPLASH SCENE ===== */
+#splash .splash-title{font-size:1.85rem;font-weight:600;letter-spacing:-0.5px;margin-top:0.5rem;
+  background:linear-gradient(135deg,var(--text-main),hsla(var(--orb-h),80%,75%,1));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#splash .splash-sub{color:var(--text-soft);font-size:1.05rem;line-height:1.8;margin-top:0.6rem;
+  max-width:320px;font-weight:300}
+#splash .splash-tagline{display:flex;gap:1.5rem;margin-top:2rem;margin-bottom:2.5rem}
+#splash .tag-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+#splash .tag-icon{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;background:hsla(var(--orb-h),20%,15%,0.5);border:1px solid hsla(var(--orb-h),30%,30%,0.2)}
+#splash .tag-label{font-size:0.75rem;color:var(--text-ghost);letter-spacing:0.03em}
+#splash .enter-btn{padding:1rem 3rem;border-radius:28px;font-size:1.05rem;font-weight:500;
+  cursor:pointer;font-family:inherit;border:none;
+  background:linear-gradient(135deg,hsla(var(--orb-h),70%,55%,0.9),hsla(var(--orb-h),80%,45%,0.9));
+  color:#fff;box-shadow:0 4px 30px hsla(var(--orb-h),70%,50%,0.3);
+  transition:all 0.4s;letter-spacing:0.05em}
+#splash .enter-btn:hover{transform:translateY(-2px);box-shadow:0 8px 40px hsla(var(--orb-h),70%,50%,0.4)}
+#splash .privacy-note{margin-top:1rem;font-size:0.82rem;color:var(--text-ghost);display:flex;align-items:center;gap:4px}
+
+/* ===== GOOGLE LOGIN ===== */
+.google-login-btn{margin-top:0.8rem;padding:0.65rem 1.3rem;border-radius:24px;
+  background:hsla(0,0%,100%,0.06);border:1px solid hsla(0,0%,100%,0.1);
+  color:var(--text-soft);font-size:0.82rem;font-family:inherit;cursor:pointer;
+  display:flex;align-items:center;gap:8px;transition:all 0.3s;
+  backdrop-filter:blur(8px)}
+.google-login-btn:hover{background:hsla(0,0%,100%,0.1);border-color:hsla(0,0%,100%,0.18)}
+.google-login-btn svg{flex-shrink:0}
+
+/* ===== CONTEXT SCENE ===== */
+#context{}
+.ctx-step-label{font-size:0.82rem;color:var(--text-ghost);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.5rem}
+.ctx-question{font-size:1.3rem;font-weight:400;margin-bottom:1.8rem;line-height:1.6;max-width:340px}
+.ctx-dots{display:flex;gap:6px;margin-bottom:2rem}
+.ctx-dot{width:6px;height:6px;border-radius:50%;background:hsla(var(--orb-h),20%,40%,0.3);transition:all 0.5s}
+.ctx-dot.active{width:24px;border-radius:3px;background:hsla(var(--orb-h),70%,65%,0.7)}
+.ctx-dot.done{background:hsla(var(--orb-h),50%,55%,0.5)}
+.ctx-options{display:flex;flex-direction:column;gap:8px;width:100%;max-width:340px}
+.ctx-opt{padding:0.9rem 1.2rem;display:flex;align-items:center;gap:10px;
+  background:hsla(var(--orb-h),20%,14%,0.4);border:1px solid hsla(var(--orb-h),20%,30%,0.15);
+  border-radius:16px;cursor:pointer;transition:all 0.3s;font-family:inherit;color:var(--text-main);
+  font-size:1rem;text-align:left;backdrop-filter:blur(6px)}
+.ctx-opt:hover{background:hsla(var(--orb-h),30%,22%,0.5);border-color:hsla(var(--orb-h),40%,50%,0.25)}
+.ctx-opt .ico{font-size:18px;width:28px;text-align:center;flex-shrink:0}
+
+/* ===== COMPANION SCENE (main experience) ===== */
+#companion{gap:0;padding-bottom:5rem}
+.companion-voice{position:relative;width:100%;min-height:80px;
+  display:flex;flex-direction:column;align-items:center}
+.companion-choices{width:100%;margin-top:1rem;padding-bottom:1rem;display:flex;flex-direction:column;align-items:center}
+
+/* ===== STATUS WHISPER (hidden) ===== */
+.status-whisper{display:none}
+
+/* ===== MOOD CHECK ===== */
+.mood-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:20;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:hsla(var(--bg-h),30%,5%,0.85);backdrop-filter:blur(12px);
+  opacity:0;pointer-events:none;transition:all 0.6s}
+.mood-overlay.visible{opacity:1;pointer-events:auto}
+.mood-q{font-size:1rem;font-weight:400;margin-bottom:2rem;text-align:center;max-width:260px;line-height:1.7}
+.mood-emojis{display:flex;gap:10px}
+.mood-emoji{width:56px;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border-radius:16px;border:1.5px solid hsla(var(--orb-h),20%,30%,0.2);
+  background:hsla(var(--orb-h),15%,12%,0.5);cursor:pointer;transition:all 0.3s;font-size:24px}
+.mood-emoji:hover{border-color:hsla(var(--orb-h),50%,60%,0.4);transform:translateY(-4px)}
+.mood-emoji .ml{font-size:0.65rem;color:var(--text-ghost);margin-top:2px}
+
+/* ===== INSIGHT CARD (floating) ===== */
+.insight-float{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);
+  width:85%;max-width:340px;padding:1.5rem;z-index:15;
+  background:hsla(var(--orb-h),20%,12%,0.7);
+  border:1px solid hsla(var(--orb-h),40%,50%,0.15);
+  border-radius:20px;backdrop-filter:blur(16px);
+  opacity:0;pointer-events:none;transition:all 0.6s cubic-bezier(0.4,0,0.2,1)}
+.insight-float.visible{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.insight-float h4{font-size:0.85rem;color:hsla(var(--orb-h),70%,75%,0.9);margin-bottom:0.6rem;
+  display:flex;align-items:center;gap:8px}
+.insight-float p{font-size:0.88rem;color:var(--text-soft);line-height:1.75;font-weight:300}
+.insight-float .insight-close{margin-top:1rem;padding:0.5rem 1.5rem;border-radius:20px;
+  background:hsla(var(--orb-h),30%,30%,0.3);border:1px solid hsla(var(--orb-h),30%,40%,0.2);
+  color:var(--text-soft);font-size:0.8rem;cursor:pointer;font-family:inherit;transition:all 0.3s}
+.insight-float .insight-close:hover{background:hsla(var(--orb-h),30%,35%,0.4)}
+
+/* ===== BREATHING EXERCISE (full screen) ===== */
+.breathe-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:18;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;
+  background:hsla(var(--bg-h),30%,4%,0.9);backdrop-filter:blur(16px);
+  opacity:0;pointer-events:none;transition:all 0.8s}
+.breathe-overlay.visible{opacity:1;pointer-events:auto}
+.breathe-orb{width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,hsla(174,50%,60%,0.6),hsla(228,50%,50%,0.3));
+  box-shadow:0 0 50px hsla(174,50%,50%,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.95rem;font-weight:400;color:var(--text-main)}
+.breathe-orb.inhale{animation:bIn 4s ease-in-out}
+.breathe-orb.hold{animation:bHold 4s ease-in-out}
+.breathe-orb.exhale{animation:bOut 4s ease-in-out}
+@keyframes bIn{from{transform:scale(0.7);opacity:0.5}to{transform:scale(1.3);opacity:1}}
+@keyframes bHold{from{transform:scale(1.3)}to{transform:scale(1.3)}}
+@keyframes bOut{from{transform:scale(1.3);opacity:1}to{transform:scale(0.7);opacity:0.5}}
+.breathe-text{font-size:0.8rem;color:var(--text-ghost)}
+.breathe-skip{margin-top:1rem;padding:0.4rem 1.2rem;background:transparent;border:1px solid hsla(var(--orb-h),20%,30%,0.3);
+  border-radius:16px;color:var(--text-ghost);font-size:0.75rem;cursor:pointer;font-family:inherit}
+
+/* ===== SAFETY BANNER ===== */
+.safety-banner{position:absolute;top:0;left:0;width:100%;z-index:30;padding:1rem 1.5rem;
+  background:rgba(80,20,20,0.92);backdrop-filter:blur(12px);
+  text-align:center;font-size:0.85rem;color:#ffcccc;line-height:1.7;
+  opacity:0;pointer-events:none;transform:translateY(-100%);transition:all 0.5s}
+.safety-banner.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+.safety-banner strong{color:#ff9999}
+.safety-banner a{color:#ffaaaa;text-decoration:underline}
+.safety-dismiss{margin-top:0.5rem;padding:0.3rem 1rem;background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.15);border-radius:12px;color:#ffcccc;
+  font-size:0.75rem;cursor:pointer;font-family:inherit}
+
+/* ===== SESSION END OVERLAY ===== */
+.session-end{position:absolute;top:0;left:0;width:100%;height:100%;z-index:25;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+  background:hsla(var(--bg-h),30%,5%,0.92);backdrop-filter:blur(16px);
+  opacity:0;pointer-events:none;transition:all 0.8s;padding:2rem}
+.session-end.visible{opacity:1;pointer-events:auto}
+.session-end h3{font-size:1.1rem;font-weight:500}
+.session-end p{font-size:0.85rem;color:var(--text-soft);line-height:1.7;max-width:280px;text-align:center}
+.session-end .resource{font-size:0.75rem;color:var(--text-ghost);margin-top:0.5rem;line-height:1.6;text-align:center}
+.session-end .restart-btn{margin-top:1rem;padding:0.7rem 2rem;border-radius:24px;
+  background:hsla(var(--orb-h),40%,30%,0.4);border:1px solid hsla(var(--orb-h),30%,40%,0.2);
+  color:var(--text-soft);font-size:0.85rem;cursor:pointer;font-family:inherit;transition:all 0.3s}
+.session-end .feedback-row{display:flex;gap:8px;margin-top:0.5rem}
+.session-end .fb-btn{padding:0.6rem 1.2rem;border-radius:16px;font-size:0.82rem;cursor:pointer;font-family:inherit;
+  border:1px solid hsla(var(--orb-h),20%,30%,0.2);background:hsla(var(--orb-h),15%,12%,0.4);
+  color:var(--text-soft);transition:all 0.4s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
+.session-end .fb-btn:hover{background:hsla(var(--orb-h),25%,22%,0.5);transform:translateY(-1px)}
+.session-end .fb-btn.selected{
+  border-color:hsla(var(--orb-h),60%,65%,0.6);
+  background:hsla(var(--orb-h),40%,28%,0.6);
+  color:hsla(var(--orb-h),80%,85%,1);
+  box-shadow:0 0 20px hsla(var(--orb-h),60%,50%,0.2),inset 0 0 12px hsla(var(--orb-h),50%,60%,0.1);
+  transform:translateY(-2px)}
+.session-end .fb-btn.selected::after{content:'';position:absolute;inset:0;border-radius:16px;
+  background:radial-gradient(circle at 50% 50%,hsla(var(--orb-h),70%,70%,0.15),transparent 70%);
+  animation:fbGlow 2s ease-in-out infinite alternate}
+@keyframes fbGlow{0%{opacity:0.5}100%{opacity:1}}
+
+/* ===== DISCLAIMER ===== */
+.disclaimer{position:absolute;bottom:8px;left:0;width:100%;text-align:center;
+  font-size:0.65rem;color:var(--text-ghost);opacity:0.5;z-index:5;pointer-events:none}
+
+/* ===== MINI ORB COLOR JOURNEY ===== */
+.mini-orb{
+  position:absolute;z-index:12;pointer-events:none;
+  width:18px;height:18px;border-radius:50%;
+  opacity:0;transform:scale(0);
+  will-change:transform,opacity,left,top}
+.mini-orb.spawned{
+  opacity:1;transform:scale(1);
+  animation:miniSpawn 0.35s cubic-bezier(0.2,0,0.2,1) forwards}
+@keyframes miniSpawn{
+  0%{opacity:0;transform:scale(0)}
+  60%{opacity:1;transform:scale(1.3)}
+  100%{opacity:0.9;transform:scale(1)}}
+.mini-orb.flying{
+  transition:left 0.75s cubic-bezier(0.5,0,0.1,1),
+             top 0.75s cubic-bezier(0.5,0,0.1,1),
+             opacity 0.75s cubic-bezier(0.3,0,0.1,1),
+             transform 0.75s cubic-bezier(0.5,0,0.1,1)}
+.mini-orb.absorbed{
+  opacity:0;transform:scale(0.15);
+  transition:all 0.35s cubic-bezier(0.6,0,0.4,1)}
+
+/* Suction pull: orb contracts slightly as it "inhales" the mini-orbs */
+.orb-core.sucking{
+  animation:orbSuck 0.9s cubic-bezier(0.4,0,0.2,1)}
+@keyframes orbSuck{
+  0%{transform:translate(-50%,-50%) scale(1)}
+  40%{transform:translate(-50%,-50%) scale(0.92)}
+  60%{transform:translate(-50%,-50%) scale(0.94)}
+  100%{transform:translate(-50%,-50%) scale(1)}}
+
+/* Absorption burst: orb expands with flash when mini-orb arrives */
+.orb-core.absorbing{
+  animation:orbAbsorb 0.7s ease-out}
+@keyframes orbAbsorb{
+  0%{filter:brightness(1);transform:translate(-50%,-50%) scale(0.94)}
+  30%{filter:brightness(1.6);transform:translate(-50%,-50%) scale(1.1)}
+  60%{filter:brightness(1.2);transform:translate(-50%,-50%) scale(0.97)}
+  100%{filter:brightness(1);transform:translate(-50%,-50%) scale(1)}}
+
+/* Absorption shockwave ring */
+.absorb-ring{
+  position:absolute;top:50%;left:50%;
+  width:160px;height:160px;border-radius:50%;
+  transform:translate(-50%,-50%) scale(0.8);
+  border:2px solid hsla(var(--orb-h),80%,70%,0.6);
+  opacity:0;pointer-events:none;z-index:11;
+  animation:absorbRing 0.8s ease-out forwards}
+@keyframes absorbRing{
+  0%{opacity:0.7;transform:translate(-50%,-50%) scale(0.8)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
+
+/* Color trail particles during flight */
+.trail-dot{
+  position:absolute;width:5px;height:5px;border-radius:50%;
+  pointer-events:none;z-index:11;
+  opacity:0.6;
+  animation:trailFade 0.6s ease-out forwards}
+@keyframes trailFade{
+  0%{opacity:0.6;transform:scale(1)}
+  100%{opacity:0;transform:scale(0.2)}}
+
+/* ===== STAGGERED CHOICE ANIMATION ===== */
+.choice-pill{opacity:0;transform:translateY(12px)}
+.choices-ring.visible .choice-pill{animation:pillFadeIn 0.45s cubic-bezier(0.4,0,0.2,1) forwards}
+.choices-ring.visible .choice-pill:nth-child(1){animation-delay:0.05s}
+.choices-ring.visible .choice-pill:nth-child(2){animation-delay:0.15s}
+.choices-ring.visible .choice-pill:nth-child(3){animation-delay:0.25s}
+.choices-ring.visible .choice-pill:nth-child(4){animation-delay:0.35s}
+@keyframes pillFadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== CONTEXT STEP TRANSITION ===== */
+.ctx-transitioning .ctx-question,.ctx-transitioning .ctx-options{
+  opacity:0;transform:translateY(-10px);transition:all 0.3s ease-out}
+.ctx-entering .ctx-question,.ctx-entering .ctx-options{
+  opacity:1;transform:translateY(0);transition:all 0.4s cubic-bezier(0.4,0,0.2,1) 0.1s}
+
+/* ===== COLOR JOURNEY SUMMARY (end screen) ===== */
+.journey-dots{display:flex;gap:6px;margin-top:0.8rem;align-items:center;justify-content:center;flex-wrap:wrap}
+.journey-dot{width:12px;height:12px;border-radius:50%;opacity:0;transform:scale(0);
+  transition:all 0.4s cubic-bezier(0.2,0,0.2,1);box-shadow:0 0 8px var(--dot-glow,transparent)}
+.journey-dot.show{opacity:1;transform:scale(1)}
+.journey-label{font-size:0.68rem;color:var(--text-ghost);margin-top:0.3rem}
+
+/* ===== TAKEAWAY CARD ===== */
+.takeaway{margin-top:1rem;padding:1rem 1.3rem;
+  background:hsla(var(--orb-h),20%,14%,0.5);
+  border:1px solid hsla(var(--orb-h),30%,40%,0.15);
+  border-radius:16px;backdrop-filter:blur(8px);
+  max-width:300px;text-align:center;
+  opacity:0;transform:translateY(10px);transition:all 0.8s cubic-bezier(0.4,0,0.2,1) 0.5s}
+.takeaway.visible{opacity:1;transform:translateY(0)}
+.takeaway-label{font-size:0.68rem;color:var(--text-ghost);letter-spacing:0.1em;margin-bottom:0.4rem}
+.takeaway-text{font-size:0.9rem;color:hsla(var(--orb-h),60%,80%,0.9);line-height:1.7;font-weight:400}
+
+/* ===== TRANSITIONS ===== */
+.fade-enter{animation:fadeUp 0.6s cubic-bezier(0.4,0,0.2,1) forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== TYPING INDICATOR (hidden — orb animation is sufficient) ===== */
+.typing-dots{display:none}
+
+</style>
+</head>
+<body>
+<div class="universe" id="app">
+  <canvas id="cosmos"></canvas>
+  <div class="atmosphere"><div class="atmo-top"></div><div class="atmo-center"></div><div class="atmo-bottom"></div></div>
+
+  <!-- PERSISTENT ORB (fixed position across all scenes) -->
+  <div class="orb-anchor" id="orbAnchor">
+    <div class="orb-space" id="compOrb">
+      <div class="orb-glow" id="compGlow"></div>
+      <div class="orb-ring1"></div>
+      <div class="orb-ring2"></div>
+      <div class="orb-core" id="compCore"></div>
+      <div class="status-whisper" id="orbStatus"></div>
+    </div>
+  </div>
+
+  <!-- SPLASH -->
+  <div class="scene active" id="splash">
+    <div class="splash-title">大叔心聲</div>
+    <div class="splash-sub">不叫你加油、不給你雞湯<br>就一個不會已讀你的地方</div>
+    <div class="splash-tagline">
+      <div class="tag-item"><div class="tag-icon">🥃</div><div class="tag-label">匿名暢聊</div></div>
+      <div class="tag-item"><div class="tag-icon">🌙</div><div class="tag-label">半夜也行</div></div>
+      <div class="tag-item"><div class="tag-icon">🧊</div><div class="tag-label">不是諮商</div></div>
+    </div>
+    <button class="enter-btn" onclick="enterSpace()">進來坐</button>
+    <div class="privacy-note">🔒 不留紀錄｜老婆不會知道</div>
+    <button class="google-login-btn" id="googleLoginBtn" onclick="handleGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.99 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09A6.99 6.99 0 0 1 5.46 12c0-.72.12-1.43.35-2.09V7.07H2.18A11.97 11.97 0 0 0 0 12c0 1.94.46 3.77 1.28 5.39l3.56-2.84.01-.46z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      <span>用 Google 登入，記住你的旅程</span>
+    </button>
+  </div>
+
+  <!-- CONTEXT -->
+  <div class="scene" id="context">
+    <div class="ctx-dots" id="ctxDots"></div>
+    <div class="ctx-step-label" id="ctxStepLabel"></div>
+    <div class="ctx-question" id="ctxQ"></div>
+    <div class="ctx-options" id="ctxOpts"></div>
+  </div>
+
+  <!-- COMPANION (main immersive experience) -->
+  <div class="scene" id="companion">
+    <div class="companion-voice" id="voiceZone">
+      <div class="typing-dots" id="typingDots"><span></span><span></span><span></span></div>
+      <div class="voice-text" id="voiceText"></div>
+    </div>
+    <div class="companion-choices">
+      <div class="choices-ring" id="choicesRing"></div>
+    </div>
+    <div class="whisper-input" id="whisperInput">
+      <div class="whisper-row">
+        <input class="whisper-field" id="whisperField" placeholder="說說你的想法..." maxlength="500">
+        <button class="whisper-send" id="whisperSend" onclick="sendWhisper()">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAYS -->
+  <div class="mood-overlay" id="moodOverlay">
+    <div class="mood-q">不用想太多，<br>直覺選一個</div>
+    <div class="mood-emojis" id="moodEmojis">
+      <div class="mood-emoji" onclick="selectMood('heavy')">🪨<span class="ml">壓到爆</span></div>
+      <div class="mood-emoji" onclick="selectMood('meh')">😐<span class="ml">行屍走肉</span></div>
+      <div class="mood-emoji" onclick="selectMood('ok')">🤷<span class="ml">活著</span></div>
+      <div class="mood-emoji" onclick="selectMood('lighter')">🍺<span class="ml">沒那麼悶</span></div>
+      <div class="mood-emoji" onclick="selectMood('good')">😎<span class="ml">還不錯欸</span></div>
+    </div>
+    <button class="breathe-skip" style="margin-top:1.2rem" onclick="selectMood('skip')">不想選</button>
+  </div>
+
+  <div class="insight-float" id="insightCard">
+    <h4>💡 <span id="insightTitle"></span></h4>
+    <p id="insightBody"></p>
+    <button class="insight-close" onclick="closeInsight()">我知道了</button>
+  </div>
+
+  <div class="breathe-overlay" id="breatheOverlay">
+    <div class="breathe-orb" id="breatheOrb">準備</div>
+    <div class="breathe-text" id="breatheText">跟著光球一起呼吸</div>
+    <button class="breathe-skip" onclick="skipBreathe()">跳過</button>
+  </div>
+
+  <div class="safety-banner" id="safetyBanner">
+    <strong>你不是一個人。</strong><br>
+    如果你正在經歷很大的痛苦，請撥打<br>
+    <a href="tel:1925">1925 安心專線</a>（24 小時免費）<br>
+    或 <a href="tel:1980">1980 張老師專線</a><br>
+    <button class="safety-dismiss" onclick="closeSafety()">我知道了</button>
+  </div>
+
+  <div class="session-end" id="sessionEnd">
+    <div class="orb-space" style="width:100px;height:100px">
+      <div class="orb-core" style="width:80px;height:80px"></div>
+      <div class="orb-glow" style="width:100px;height:100px"></div>
+    </div>
+    <h3 id="endTitle">今天先到這，大叔</h3>
+    <p id="endMsg">能走到這一步的人不多。你今天願意打開這個頁面、把那些話說出來——這件事本身就比大多數人勇敢了。下次累了再來。</p>
+    <div class="journey-dots" id="journeyDots"></div>
+    <div class="journey-label" id="journeyLabel"></div>
+    <div class="takeaway" id="takeawayCard">
+      <div class="takeaway-label">帶走這句</div>
+      <div class="takeaway-text" id="takeawayText"></div>
+    </div>
+    <div class="feedback-row" id="feedbackRow">
+      <button class="fb-btn" data-fb="helpful">有被懂的感覺</button>
+      <button class="fb-btn" data-fb="ok">還行吧</button>
+      <button class="fb-btn" data-fb="meh">浪費時間</button>
+    </div>
+    <div class="resource" id="endResource">需要真人聊聊：1925 安心專線（24H 免費，不會出現在帳單上）<br>我不是心理師，只是一個不會已讀你的地方</div>
+    <button class="restart-btn" onclick="restartSession()">再來一輪</button>
+  </div>
+
+  <div class="disclaimer">此服務不是醫療行為，無法取代專業諮商</div>
+</div>
+
+<script>
+// ===== COSMOS PARTICLE SYSTEM =====
+const canvas = document.getElementById('cosmos');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let cosmosHue = 228;
+let cosmosSat = 40;
+let cosmosEnergy = 0.3; // 0-1 energy level affects particle behavior
+
+function resizeCanvas(){
+  const r = window.devicePixelRatio || 1;
+  const rect = document.getElementById('app').getBoundingClientRect();
+  canvas.width = rect.width * r;
+  canvas.height = rect.height * r;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.scale(r,r);
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Particle{
+  constructor(){
+    this.reset();
+  }
+  reset(){
+    const rect = canvas.getBoundingClientRect();
+    this.x = Math.random() * rect.width;
+    this.y = Math.random() * rect.height;
+    this.size = Math.random() * 2.5 + 0.5;
+    this.speedX = (Math.random() - 0.5) * 0.3;
+    this.speedY = (Math.random() - 0.5) * 0.2 - 0.1;
+    this.opacity = Math.random() * 0.4 + 0.1;
+    this.pulse = Math.random() * Math.PI * 2;
+    this.pulseSpeed = Math.random() * 0.02 + 0.005;
+  }
+  update(){
+    const rect = canvas.getBoundingClientRect();
+    this.pulse += this.pulseSpeed;
+    const energy = cosmosEnergy;
+    this.x += this.speedX * (1 + energy);
+    this.y += this.speedY * (1 + energy * 0.5);
+    if(this.x < -10 || this.x > rect.width + 10 || this.y < -10 || this.y > rect.height + 10){
+      this.reset();
+      this.y = rect.height + 5;
+    }
+  }
+  draw(){
+    const a = this.opacity * (0.6 + Math.sin(this.pulse) * 0.4);
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${cosmosHue}, ${cosmosSat}%, 70%, ${a})`;
+    ctx.fill();
+  }
+}
+
+for(let i = 0; i < 60; i++) particles.push(new Particle());
+
+function animateCosmos(){
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animateCosmos);
+}
+animateCosmos();
+
+function setMood(mood){
+  const root = document.documentElement;
+  const core = document.getElementById('compCore');
+  const atmoTop = document.querySelector('.atmo-top');
+  const atmoCenter = document.querySelector('.atmo-center');
+
+  if(core) core.className = 'orb-core';
+
+  // Mood-specific energy & animation class (always applied)
+  const moodData = {
+    neutral:    {h:228, s:80, energy:0.3, cls:'listening'},
+    listening:  {h:228, s:80, energy:0.3, cls:'listening'},
+    thinking:   {h:240, s:70, energy:0.5, cls:'thinking'},
+    empathy:    {h:174, s:55, energy:0.2, cls:'empathy'},
+    warmth:     {h:32,  s:70, energy:0.25, cls:'warmth'},
+    insight:    {h:260, s:65, energy:0.4, cls:''},
+    alert:      {h:0,   s:60, energy:0.15, cls:''}
+  };
+  const md = moodData[mood] || moodData.neutral;
+
+  // Always apply animation class and energy
+  if(core && md.cls) core.classList.add(md.cls);
+  cosmosEnergy = md.energy;
+
+  // COLOR RULE: Once colors are absorbed, the blended color OWNS the orb.
+  // setMood never overrides it — only animation class + particle energy change.
+  if(colorJourney.length > 0){
+    // Re-apply blended color to CSS vars so the orb stays the journey color
+    const bh = Math.round(blendedHue);
+    const bs = Math.round(blendedSat);
+    root.style.setProperty('--orb-h', String(bh));
+    root.style.setProperty('--orb-s', bs + '%');
+    cosmosHue = bh;
+    cosmosSat = Math.max(25, bs - 15);
+  } else {
+    // No journey yet — use mood color directly
+    root.style.setProperty('--orb-h', String(md.h));
+    root.style.setProperty('--orb-s', md.s + '%');
+    cosmosHue = md.h;
+    cosmosSat = Math.max(25, md.s - 15);
+  }
+
+  // update atmosphere (always based on current cosmosHue)
+  if(atmoTop) atmoTop.style.background = `radial-gradient(ellipse at 50% 0%,hsla(${cosmosHue},40%,20%,0.25) 0%,transparent 70%)`;
+  if(atmoCenter) atmoCenter.style.background = `radial-gradient(circle,hsla(${cosmosHue},50%,30%,0.12) 0%,transparent 70%)`;
+}
+
+// ===== COLOR JOURNEY ENGINE =====
+const colorJourney = []; // {h, s, l, weight}
+let blendedHue = 228;
+let blendedSat = 80;
+let blendedLight = 65;
+
+// Topic → Color map (HSL hues)
+const topicColorMap = {
+  // AI anxiety branch — electric blue
+  ai_replace:{h:210,s:85,l:62}, ai_learn:{h:215,s:80,l:60}, ai_worth:{h:205,s:82,l:58},
+  ai_core:{h:200,s:75,l:65}, ai_practical:{h:195,s:70,l:60}, ai_direction:{h:218,s:78,l:62},
+  ai_identity:{h:225,s:72,l:68},
+  // Career — amber/gold
+  career_stuck:{h:38,s:80,l:58}, career_want:{h:42,s:75,l:55}, career_age:{h:35,s:82,l:60},
+  career_daily:{h:30,s:78,l:56}, career_meaning:{h:48,s:70,l:62}, career_time:{h:32,s:76,l:58},
+  // Burnout — deep red-orange
+  burn_body:{h:8,s:75,l:55}, burn_emotional:{h:15,s:70,l:52}, burn_mask:{h:5,s:72,l:50},
+  burn_sleep:{h:12,s:68,l:54}, burn_rest:{h:20,s:60,l:58}, burn_escape:{h:0,s:65,l:48},
+  burn_check:{h:355,s:60,l:50},
+  // Meaning — violet/purple
+  mean_work:{h:270,s:65,l:60}, mean_life:{h:280,s:62,l:58}, mean_empty:{h:265,s:58,l:55},
+  mean_self:{h:275,s:60,l:62}, mean_waste:{h:260,s:55,l:58}, mean_dare:{h:285,s:62,l:60},
+  mean_next:{h:290,s:58,l:65},
+  // Chat — teal
+  chat_work:{h:168,s:55,l:55}, chat_life:{h:175,s:50,l:58}, chat_vague:{h:180,s:48,l:55},
+  // Shared — warm/empathy tones
+  family_anchor:{h:45,s:65,l:62}, relationship1:{h:340,s:55,l:58}, enough1:{h:155,s:60,l:60},
+  loneliness1:{h:250,s:50,l:52}, expression1:{h:160,s:55,l:58}, partner1:{h:345,s:50,l:56},
+  silence1:{h:235,s:40,l:50},
+  // Validation / warmth
+  validate1:{h:155,s:55,l:58}, dig1:{h:165,s:50,l:56}, dig1_social:{h:350,s:48,l:55},
+  deeper1:{h:228,s:60,l:55}, tired_core:{h:10,s:55,l:52}, courage1:{h:50,s:65,l:62},
+  mask_deeper:{h:340,s:52,l:55}, post_mood:{h:45,s:60,l:60},
+  // Safety — deep red
+  safety_trigger:{h:0,s:70,l:45},
+  // Closing — warm gold
+  closing_prep:{h:42,s:68,l:62}, closing_final:{h:48,s:72,l:65}
+};
+
+// Default color for unmapped nodes
+const defaultMiniColor = {h:228,s:60,l:58};
+
+function getNodeColor(nodeId){
+  return topicColorMap[nodeId] || defaultMiniColor;
+}
+
+// Circular hue averaging using cartesian method
+function blendColors(){
+  if(colorJourney.length === 0) return;
+
+  let totalWeight = 0;
+  let sinSum = 0, cosSum = 0, satSum = 0, lightSum = 0;
+
+  colorJourney.forEach((c, i) => {
+    // Recent colors weighted more heavily
+    const recency = 0.5 + 0.5 * (i / (colorJourney.length - 1 || 1));
+    const w = c.weight * recency;
+    totalWeight += w;
+    const rad = c.h * Math.PI / 180;
+    sinSum += Math.sin(rad) * w;
+    cosSum += Math.cos(rad) * w;
+    satSum += c.s * w;
+    lightSum += c.l * w;
+  });
+
+  blendedHue = ((Math.atan2(sinSum / totalWeight, cosSum / totalWeight) * 180 / Math.PI) + 360) % 360;
+  blendedSat = satSum / totalWeight;
+  blendedLight = lightSum / totalWeight;
+
+  // Smoothly transition the main orb to blended color
+  applyBlendedColor();
+}
+
+function applyBlendedColor(){
+  const root = document.documentElement;
+  const h = Math.round(blendedHue);
+  const s = Math.round(blendedSat);
+  const l = Math.round(blendedLight);
+
+  root.style.setProperty('--orb-h', String(h));
+  root.style.setProperty('--orb-s', s + '%');
+  root.style.setProperty('--orb-l', l + '%');
+
+  // Sync cosmos particles with a softer blend
+  cosmosHue = h;
+  cosmosSat = Math.max(25, s - 15);
+}
+
+// Spawn 1-3 mini-orbs at random positions around the main orb (top/left/right)
+// then fly them into the orb with a suction pull effect
+function spawnMiniOrb(nodeId){
+  const color = getNodeColor(nodeId);
+  const orbEl = document.getElementById('compOrb');
+  if(!orbEl) return;
+
+  const universe = document.getElementById('app');
+  const uRect = universe.getBoundingClientRect();
+  const oRect = orbEl.getBoundingClientRect();
+  const targetX = oRect.left + oRect.width / 2 - uRect.left;
+  const targetY = oRect.top + oRect.height / 2 - uRect.top;
+
+  // Spawn 1-3 mini-orbs
+  const count = 1 + Math.floor(Math.random() * 3);
+  // Possible spawn zones: top, left, right (not bottom — that's where text is)
+  const zones = ['top','left','right'];
+
+  // Start suction pull on main orb
+  startSuction();
+
+  for(let i = 0; i < count; i++){
+    const zone = zones[Math.floor(Math.random() * zones.length)];
+    const delay = i * 180; // Stagger spawns
+
+    setTimeout(() => {
+      // Calculate spawn position based on zone
+      let startX, startY;
+      const orbR = 130; // Distance from orb center
+      const jitter = (Math.random() - 0.5) * 60;
+
+      if(zone === 'top'){
+        startX = targetX + jitter;
+        startY = targetY - orbR - Math.random() * 40;
+      } else if(zone === 'left'){
+        startX = targetX - orbR - Math.random() * 40;
+        startY = targetY + jitter * 0.6 - 30;
+      } else {
+        startX = targetX + orbR + Math.random() * 40;
+        startY = targetY + jitter * 0.6 - 30;
+      }
+
+      // Slight hue variation per orb for richness
+      const hVar = color.h + (Math.random() - 0.5) * 20;
+
+      const mini = document.createElement('div');
+      mini.className = 'mini-orb';
+      mini.style.left = startX - 9 + 'px';
+      mini.style.top = startY - 9 + 'px';
+      mini.style.background = `radial-gradient(circle at 35% 30%,
+        hsla(${hVar},${color.s}%,${color.l + 15}%,0.95),
+        hsla(${hVar},${color.s}%,${color.l}%,0.7))`;
+      mini.style.boxShadow = `0 0 14px hsla(${hVar},${color.s}%,${color.l}%,0.6),
+        0 0 28px hsla(${hVar},${color.s}%,${color.l}%,0.2)`;
+      universe.appendChild(mini);
+
+      // Phase 1: Spawn pop
+      requestAnimationFrame(() => {
+        mini.classList.add('spawned');
+      });
+
+      // Phase 2: Fly toward orb center (suction pull)
+      setTimeout(() => {
+        mini.classList.remove('spawned');
+        mini.classList.add('flying');
+        mini.style.left = targetX - 9 + 'px';
+        mini.style.top = targetY - 9 + 'px';
+        mini.style.transform = 'scale(0.3)';
+        mini.style.opacity = '0.5';
+
+        // Drop trail particles
+        dropTrail(startX, startY, targetX, targetY, {h:hVar, s:color.s, l:color.l}, universe);
+      }, 350);
+
+      // Phase 3: Absorption
+      setTimeout(() => {
+        mini.classList.remove('flying');
+        mini.classList.add('absorbed');
+
+        // Only trigger full absorption on last orb
+        if(i === count - 1){
+          triggerAbsorption(color);
+          colorJourney.push({h: color.h, s: color.s, l: color.l, weight: 1});
+          blendColors();
+        }
+
+        setTimeout(() => {
+          if(mini.parentNode) mini.parentNode.removeChild(mini);
+        }, 400);
+      }, 1150);
+    }, delay);
+  }
+}
+
+// Suction effect: main orb briefly "pulls inward" then expands
+function startSuction(){
+  const core = document.getElementById('compCore');
+  if(!core) return;
+  core.classList.add('sucking');
+  setTimeout(() => core.classList.remove('sucking'), 900);
+}
+
+function dropTrail(x1, y1, x2, y2, color, container){
+  const steps = 5;
+  for(let i = 1; i <= steps; i++){
+    setTimeout(() => {
+      const t = i / (steps + 1);
+      // Slight curve (quadratic bezier feel)
+      const cx = (x1 + x2) / 2 + (Math.random() - 0.5) * 30;
+      const cy = Math.min(y1, y2) - 40;
+      const px = (1-t)*(1-t)*x1 + 2*(1-t)*t*cx + t*t*x2;
+      const py = (1-t)*(1-t)*y1 + 2*(1-t)*t*cy + t*t*y2;
+
+      const dot = document.createElement('div');
+      dot.className = 'trail-dot';
+      dot.style.left = px - 2.5 + 'px';
+      dot.style.top = py - 2.5 + 'px';
+      dot.style.background = `hsla(${color.h},${color.s}%,${color.l}%,0.5)`;
+      container.appendChild(dot);
+
+      setTimeout(() => {
+        if(dot.parentNode) dot.parentNode.removeChild(dot);
+      }, 650);
+    }, i * 120);
+  }
+}
+
+function triggerAbsorption(color){
+  const core = document.getElementById('compCore');
+  const orbSpace = document.getElementById('compOrb');
+  if(!core || !orbSpace) return;
+
+  // Flash the orb with absorbed color briefly
+  core.style.filter = `brightness(1.4) hue-rotate(${color.h - blendedHue}deg)`;
+  setTimeout(() => { core.style.filter = ''; }, 300);
+
+  // Add temporary absorption animation
+  core.classList.add('absorbing');
+  setTimeout(() => core.classList.remove('absorbing'), 700);
+
+  // Spawn shockwave ring
+  const ring = document.createElement('div');
+  ring.className = 'absorb-ring';
+  ring.style.borderColor = `hsla(${color.h},${color.s}%,${color.l}%,0.5)`;
+  orbSpace.appendChild(ring);
+  setTimeout(() => {
+    if(ring.parentNode) ring.parentNode.removeChild(ring);
+  }, 850);
+}
+
+// Reset color journey for new session
+function resetColorJourney(){
+  colorJourney.length = 0;
+  blendedHue = 228;
+  blendedSat = 80;
+  blendedLight = 65;
+}
+
+// ===== SCENE MANAGEMENT =====
+function showScene(id){
+  document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===== SPLASH → CONTEXT =====
+function enterSpace(){
+  showScene('context');
+  startContext();
+}
+
+// ===== CONTEXT SELECTION =====
+const contextSteps = [
+  {
+    label: 'STEP 1/3',
+    question: '最近在煩什麼？',
+    options: [
+      {ico:'🤖', text:'AI 要來搶飯碗了是不是', key:'ai'},
+      {ico:'🔄', text:'卡住了，不上不下最難受', key:'career'},
+      {ico:'💥', text:'快爆了，每天都在撐', key:'burnout'},
+      {ico:'🌀', text:'忙了半天不知道在忙什麼', key:'meaning'},
+      {ico:'🍺', text:'沒什麼大事，就想靠北一下', key:'chat'}
+    ]
+  },
+  {
+    label: 'STEP 2/3',
+    question: '混哪一行的？',
+    options: [
+      {ico:'💻', text:'科技／寫 code 的', key:'tech'},
+      {ico:'📊', text:'金融／數字不會騙人那種', key:'finance'},
+      {ico:'📱', text:'行銷／賣命做創意的', key:'marketing'},
+      {ico:'👔', text:'帶人的／夾心餅乾', key:'mgmt'},
+      {ico:'🔹', text:'以上皆非', key:'other'}
+    ]
+  },
+  {
+    label: 'STEP 3/3',
+    question: '哪個年代的大叔？',
+    options: [
+      {ico:'🎮', text:'25-30 — 剛踏入社會的菜鳥大叔', key:'25'},
+      {ico:'⚡', text:'31-35 — 什麼都要扛的中堅大叔', key:'31'},
+      {ico:'🏋️', text:'36-40 — 上有老下有小的夾心大叔', key:'36'},
+      {ico:'🥃', text:'41-45 — 資深但迷惘的老江湖', key:'41'},
+      {ico:'🎯', text:'45+ — 看過風浪的老大叔', key:'45+'}
+    ]
+  }
+];
+let ctxStep = 0;
+let userCtx = {};
+
+function startContext(){
+  ctxStep = 0;
+  userCtx = {};
+  renderCtxStep();
+}
+
+function renderCtxStep(){
+  const step = contextSteps[ctxStep];
+  document.getElementById('ctxStepLabel').textContent = step.label;
+  document.getElementById('ctxQ').textContent = step.question;
+
+  // dots
+  const dotsEl = document.getElementById('ctxDots');
+  dotsEl.innerHTML = '';
+  for(let i = 0; i < contextSteps.length; i++){
+    const d = document.createElement('div');
+    d.className = 'ctx-dot' + (i === ctxStep ? ' active' : (i < ctxStep ? ' done' : ''));
+    dotsEl.appendChild(d);
+  }
+
+  const optsEl = document.getElementById('ctxOpts');
+  optsEl.innerHTML = '';
+  step.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'ctx-opt';
+    btn.innerHTML = `<span class="ico">${opt.ico}</span><span>${opt.text}</span>`;
+    btn.onclick = () => {
+      // Spawn a subtle mini-orb during context selection too
+      const ctxColors = {
+        ai:{h:210,s:80,l:60}, career:{h:38,s:75,l:58}, burnout:{h:12,s:72,l:52},
+        meaning:{h:270,s:62,l:58}, chat:{h:168,s:55,l:55},
+        tech:{h:220,s:70,l:62}, finance:{h:45,s:68,l:58}, marketing:{h:320,s:55,l:60},
+        mgmt:{h:30,s:65,l:56}, other:{h:200,s:50,l:58},
+        '25':{h:150,s:60,l:62}, '31':{h:175,s:58,l:58}, '36':{h:35,s:65,l:55},
+        '41':{h:280,s:55,l:58}, '45+':{h:310,s:50,l:55}
+      };
+      const c = ctxColors[opt.key] || {h:228,s:60,l:58};
+      colorJourney.push({h:c.h, s:c.s, l:c.l, weight:0.5});
+      blendColors(); // Calculate blended values immediately
+      selectCtx(opt.key);
+    };
+    optsEl.appendChild(btn);
+  });
+}
+
+function selectCtx(key){
+  if(ctxStep === 0) userCtx.concern = key;
+  else if(ctxStep === 1) userCtx.job = key;
+  else userCtx.age = key;
+
+  ctxStep++;
+  if(ctxStep < contextSteps.length){
+    // Smooth transition between context steps
+    const ctxScene = document.getElementById('context');
+    const q = document.getElementById('ctxQ');
+    const opts = document.getElementById('ctxOpts');
+    q.style.opacity = '0'; q.style.transform = 'translateY(-10px)';
+    opts.style.opacity = '0'; opts.style.transform = 'translateY(-10px)';
+    setTimeout(() => {
+      renderCtxStep();
+      requestAnimationFrame(() => {
+        q.style.transition = 'all 0.4s cubic-bezier(0.4,0,0.2,1)';
+        opts.style.transition = 'all 0.4s cubic-bezier(0.4,0,0.2,1) 0.1s';
+        q.style.opacity = '1'; q.style.transform = 'translateY(0)';
+        opts.style.opacity = '1'; opts.style.transform = 'translateY(0)';
+      });
+    }, 300);
+  } else {
+    beginCompanionSession();
+  }
+}
+
+// ===== COMPANION SESSION =====
+let conversationTree = {};
+let currentNode = null;
+let messageCount = 0;
+let deepResponseCount = 0;
+let hasUsedFreeText = false;
+let sessionActive = false;
+
+function beginCompanionSession(){
+  showScene('companion');
+  sessionActive = true;
+  buildConversationTree();
+  setMood('listening');
+  setTimeout(() => {
+    navigateTo('opening');
+  }, 800);
+}
+
+// === PROGRESSIVE UNDERSTANDING — closing texts that reference the journey ===
+function getClosingPrepText(){
+  const c = userCtx.concern;
+  const visited = colorJourney.length;
+  // The more they've shared, the more "I get you" the closing feels
+  if(visited >= 8){
+    const deep = {
+      ai: '聊了這麼多，我大概看到一個輪廓了——你不是怕 AI，你是怕自己不夠好。但一個不夠好的人不會在這裡跟我聊這些。',
+      career: '聽下來，你的問題不是不夠努力——是努力的方向不確定。大叔跟大叔講一句：方向不對的努力比偷懶還累。',
+      burnout: '你扛的東西比你以為的多。聊到現在我覺得——你需要的不是解法，是先喘口氣。',
+      meaning: '空虛不是因為你擁有太少，是因為你對自己的標準太高。你值得對自己好一點，不騙你。',
+      chat: '今天的對話讓我看到一件事——你比你以為的更在乎。在乎的人才會覺得煩，不在乎的人早就無感了。'
+    };
+    return deep[c] || '走到這一步的大叔不多。你今天很不一樣。';
+  }
+  // Shorter journey
+  const short = {
+    ai: '好，大致知道你在想什麼了。走之前，讓我說一句比較直的。',
+    career: '嗯，我大概了解你的狀態了。以一個過來人的角度，跟你說一件事。',
+    burnout: '你撐了很久了。走之前，我跟你講一句不客氣的話。',
+    meaning: '聽完你說的，我想跟你分享一個很樸素但真的有用的想法。',
+    chat: '好，聊得差不多了。走之前說一件正經的。'
+  };
+  return short[c] || '走之前，兄弟跟你說一句。';
+}
+
+function getClosingSuggestText(){
+  const c = userCtx.concern;
+  // Actionable suggestions — 大叔經驗談 tone, not therapist advice
+  const suggests = {
+    ai: '明天上班的時候，花 15 分鐘用 AI 做一件你本來要花一小時做的事。不是為了追趨勢——是為了讓你自己感受到「原來我可以駕馭這玩意」。焦慮變成掌控感，只需要一次成功經驗。',
+    career: '這週找一個你覺得「還不錯」的前輩，約他喝杯咖啡。不是要他指路——是看看另一種活法。有時候出路不是想出來的，是看到的。',
+    burnout: '今天晚上回去，做一件事：把手機放在客廳，不帶進臥室。就這一件事。不是要你斷網——是讓你的大腦知道「睡覺的地方不用工作」。小事，但會有感覺。',
+    meaning: '從明天開始，每天注意一件讓你覺得「欸，這個不討厭」的事。不用分析，不用行動，就注意。累積兩週之後，你會看到一個自己都沒察覺的模式。',
+    chat: '找一天，跟一個你信任的人說：「最近有點悶，沒什麼大事，就想聊。」不用等對方解決問題——光是說出來，就已經在解決了。'
+  };
+  return suggests[c] || '今天回去早點睡。認真的。有些問題睡一覺之後會長得不太一樣。';
+}
+
+// Takeaway quotes based on journey
+function getTakeawayText(){
+  const c = userCtx.concern;
+  const takeaways = {
+    ai: '你不需要跑得比 AI 快，你只需要做 AI 做不到的事——帶著恐懼往前走。',
+    career: '方向不是想出來的，是走出來的。但前提是你先停下來看看路。',
+    burnout: '承認自己累了，不是示弱。是你終於對自己誠實了。',
+    meaning: '空虛是你心裡的指南針在轉——它在找方向，不是壞掉了。',
+    chat: '能把心裡的話說出來的大叔，比悶著的那個強。'
+  };
+  return takeaways[c] || '你比你以為的更強。只是你習慣了不給自己打分。';
+}
+
+function buildConversationTree(){
+  const c = userCtx.concern;
+  const j = userCtx.job;
+
+  // Dynamic opening based on context — 大叔語氣版
+  const openings = {
+    ai: {
+      tech: '每天都有新的 AI 工具跑出來搶戲。寫了十年 code 的你，突然覺得自己跟一個剛出生三個月的語言模型在搶同一碗飯⋯⋯很荒謬，但也很真實。',
+      finance: '考了一堆證照，熬了多少夜，結果 AI 說它也會做財報分析。你心裡大概在想：「所以我這些年是在⋯⋯？」',
+      marketing: 'AI 三秒生一篇文案，你改了三天的那篇突然顯得很多餘。最氣的不是它做得好，是老闆居然覺得「差不多啊」。',
+      mgmt: '帶人的也怕——如果 AI 能把你底下的人都取代了，那你管理的是什麼？一台伺服器的情緒嗎？',
+      other: '每天刷到「AI 又能幹嘛了」的新聞，感覺自己像站在月台上，列車已經開了，你手上的票還沒找到。'
+    },
+    career: {
+      tech: '科技圈講求的是「持續成長」，但你心裡知道，有時候光是「維持不倒」就已經很累了。',
+      finance: '金融這條路看起來穩到不行，但穩到你快窒息了。想動又不敢動，不動又覺得在慢性死亡。',
+      marketing: '行銷這行變太快了。你追著趨勢跑，但偶爾回頭看，好像自己也沒長到哪裡去。',
+      mgmt: '升到這個位置的人不會承認自己迷路。但你心裡清楚——你不是在往上爬，是在原地轉圈。',
+      other: '工作幾年之後的某一天，突然在通勤的路上問自己：「我到底在幹嘛？」然後到公司又裝作什麼都沒想過。'
+    },
+    burnout: {
+      tech: '科技業的速度快到連「我好累」都來不及說，就又來一個 sprint 了。你上次不加班是什麼時候？',
+      finance: '數字、deadline、合規、客戶的情緒、老闆的要求⋯⋯你是在做金融，還是在做人體壓力測試？',
+      marketing: '白天追 KPI，晚上趕提案，深夜改老闆改到第五版的簡報。身體還在動，靈魂好像已經離線了。',
+      mgmt: '帶團隊最累的不是工作本身，是你的壓力沒有人可以往上報。因為你就是那個「上面」。',
+      other: '撐到現在也不知道為什麼。可能就習慣了——但「習慣撐著」不代表你 OK。'
+    },
+    meaning: {
+      tech: '寫了這麼多年的 code，偶爾會在 commit 之後想：「所以呢？這世界有因為這個 feature 變好一點嗎？」',
+      finance: '每天搬別人的錢，處理別人的資產，但回到家突然不知道自己的人生帳戶裡有什麼。',
+      marketing: '幫一堆品牌講故事、找定位、建人設。但你自己的人設呢？你自己的故事呢？',
+      mgmt: '管了一堆人、扛了一堆事，但某天夜裡突然覺得——我到底管到了什麼？好像什麼也沒留下。',
+      other: '忙了這麼久，突然有一天不知道自己在忙什麼。那個瞬間比任何 deadline 都讓人不安。'
+    },
+    chat: {
+      tech: '寫 code 的人很少被問「你今天過得怎樣」。反正出 bug 的時候就會有人找你了。今天不聊 bug，聊你。',
+      finance: '你的生活大概已經夠嚴肅了。今天不用報告、不用合規、不用算數字。隨便聊。',
+      marketing: '行銷人最擅長幫別人說故事。今天換你，說說你自己的就好。',
+      mgmt: '今天不用當主管、不用做決定、不用 maintain 什麼人設。在這裡你就是你自己。',
+      other: '沒什麼大事也可以來。有時候最需要聊的，就是那些「說不上來」的東西。'
+    }
+  };
+
+  const opening = (openings[c] && openings[c][j]) || openings[c]?.other || '嘿，今天你還好嗎？';
+
+  // Build full conversation tree
+  conversationTree = {
+    opening: {
+      text: opening,
+      mood: 'empathy',
+      status: '讀取中',
+      delay: 2000,
+      replies: [
+        {text: '你怎麼知道', next: 'validate1'},
+        {text: '差不多是這樣', next: 'validate1'},
+        {text: '比你講的更慘', next: 'deeper1'}
+      ],
+      allowFree: true
+    },
+    validate1: {
+      text: '因為你不是特例。這年頭，光是裝沒事就很累了——你身邊一堆人也在裝，只是大家都很會演。',
+      mood: 'warmth',
+      status: '同頻中',
+      delay: 1800,
+      replies: [
+        {text: '知道別人也慘，我也沒比較爽', next: 'dig1'},
+        {text: '對啊，大家都在演', next: 'dig1_social'},
+        {text: '不想聊大道理，說具體的', next: 'deeper1'}
+      ]
+    },
+    deeper1: {
+      text: '好，不廢話。哪一塊最讓你睡不著？',
+      mood: 'listening',
+      status: '聽著',
+      delay: 1500,
+      replies: c === 'ai' ? [
+        {text: '怕被取代的焦慮', next: 'ai_replace'},
+        {text: '學也學不完的絕望', next: 'ai_learn'},
+        {text: '覺得自己的能力在貶值', next: 'ai_worth'}
+      ] : c === 'career' ? [
+        {text: '看不到出路', next: 'career_stuck'},
+        {text: '不知道自己想要什麼', next: 'career_want'},
+        {text: '年紀到了但還在原地', next: 'career_age'}
+      ] : c === 'burnout' ? [
+        {text: '身體在抗議了', next: 'burn_body'},
+        {text: '心裡的累說不出來', next: 'burn_emotional'},
+        {text: '每天都在假裝 OK', next: 'burn_mask'}
+      ] : c === 'meaning' ? [
+        {text: '工作沒意義', next: 'mean_work'},
+        {text: '人生沒意義', next: 'mean_life'},
+        {text: '什麼都有了但不快樂', next: 'mean_empty'}
+      ] : [
+        {text: '公司的鳥事', next: 'chat_work'},
+        {text: '生活的鳥事', next: 'chat_life'},
+        {text: '說不清，就是悶', next: 'chat_vague'}
+      ],
+      allowFree: true
+    },
+    dig1: {
+      text: '確實。「大家都很慘」不會讓你比較不慘。但至少在這裡不用演了——平常吞回去的那些話，今天可以說出來。反正我不會跟你同事講。',
+      mood: 'empathy',
+      status: '接住了',
+      delay: 2200,
+      replies: [
+        {text: '⋯好吧', next: 'deeper1'},
+        {text: '我很久沒跟人聊這些了', next: 'loneliness1'},
+        {text: '我不太會講這種事', next: 'expression1'}
+      ]
+    },
+    dig1_social: {
+      text: '尤其是男的。我們從小被訓練成「有事自己扛」，扛到最後不是倒了就是爆了。你上次跟誰說真話是什麼時候？',
+      mood: 'warmth',
+      status: '靠近中',
+      delay: 2000,
+      replies: [
+        {text: '想不起來', next: 'loneliness1'},
+        {text: '跟老婆吧', next: 'partner1'},
+        {text: '沒有人', next: 'loneliness1'}
+      ]
+    },
+    loneliness1: {
+      text: '一個人扛太久，會忘記可以放下來這件事。就像背一個很重的包太久，身體會以為那是自己的一部分。今天先在這裡歇一下？',
+      mood: 'empathy',
+      status: '在這裡',
+      delay: 2000,
+      after: 'mood_check',
+      replies: [
+        {text: '嗯', next: 'post_mood'},
+        {text: '試試看吧', next: 'post_mood'}
+      ]
+    },
+    expression1: {
+      text: '正常。我們又沒上過「如何表達你很廢」這門課。不用講得漂亮，想到什麼說什麼就好，文法不對也沒關係。',
+      mood: 'warmth',
+      status: '沒關係',
+      delay: 1800,
+      replies: [
+        {text: '好', next: 'deeper1'},
+        {text: '⋯⋯', next: 'silence1'}
+      ],
+      allowFree: true
+    },
+    partner1: {
+      text: '有人可以聊是好事。但有些話連對枕邊人都說不出口——不是不信任，是怕說了之後她擔心，然後你還要花力氣安慰她。結果更累。',
+      mood: 'empathy',
+      status: '懂的',
+      delay: 2000,
+      replies: [
+        {text: '對，就是這樣', next: 'deeper1'},
+        {text: '其實⋯我們之間也有問題', next: 'relationship1'}
+      ]
+    },
+    silence1: {
+      text: '不說話也行。我又不趕著去哪。',
+      mood: 'listening',
+      status: '等你',
+      delay: 3000,
+      replies: [
+        {text: '⋯我真的很累', next: 'tired_core'},
+        {text: '聊聊工作好了', next: 'deeper1'}
+      ],
+      allowFree: true
+    },
+
+    // === AI ANXIETY BRANCH ===
+    ai_replace: {
+      text: '你怕的不只是丟工作。你怕的是——如果 AI 能做你做的事，那「你」的意義在哪？這個問題比裁員通知還可怕。',
+      mood: 'empathy',
+      status: '說中了吧',
+      delay: 2000,
+      after: 'insight_ai',
+      replies: [
+        {text: '⋯你說到點上了', next: 'ai_core'},
+        {text: '沒那麼深，我就是怕沒工作', next: 'ai_practical'}
+      ]
+    },
+    ai_learn: {
+      text: '今天學 Prompt Engineering，明天學 AI Agent，後天又冒出個新框架。你焦慮的可能不是「不知道學什麼」，而是「怕學了也是白學」——對吧？',
+      mood: 'thinking',
+      status: '在想',
+      delay: 2000,
+      replies: [
+        {text: '被你說中了', next: 'ai_core'},
+        {text: '不是，我是真的不知道方向', next: 'ai_direction'}
+      ]
+    },
+    ai_worth: {
+      text: '花了好幾年磨出來的本事，結果一個 AI 模型更新一下就追上來了。那種感覺就像——你辛苦爬到三樓，人家直接搭電梯到五樓。',
+      mood: 'empathy',
+      status: '接住了',
+      delay: 2200,
+      replies: [
+        {text: '精準', next: 'ai_core'},
+        {text: '我就是不甘心', next: 'ai_identity'}
+      ]
+    },
+    ai_core: {
+      text: '跟你說一個殘酷但真實的事：AI 確實會取代很多任務。但它做不到的是——在不確定的世界裡，做出帶有判斷力的決定。你現在敢來這裡面對自己，就是 AI 學不來的事。',
+      mood: 'warmth',
+      status: '認真的',
+      delay: 2500,
+      after: 'breathe_suggest',
+      replies: [
+        {text: '聽起來有道理', next: 'closing_prep'},
+        {text: '道理我懂，但房貸不懂', next: 'ai_practical'}
+      ]
+    },
+    ai_practical: {
+      text: '你說的對，道理不能當飯吃。但你有沒有發現，一個焦慮到爆的人做出來的決定通常都不怎麼樣？先讓腦子靜一下，再去想出路。順序很重要。',
+      mood: 'thinking',
+      status: '務實中',
+      delay: 2200,
+      after: 'breathe_suggest',
+      replies: [
+        {text: '有道理', next: 'closing_prep'},
+        {text: '好吧', next: 'closing_prep'}
+      ]
+    },
+    ai_direction: {
+      text: '方向不是坐在那邊想出來的，是摸索出來的。但前提是你腦子裡有空間去摸索，而不是被焦慮塞滿。今天先清一點空間出來？',
+      mood: 'warmth',
+      status: '幫你想',
+      delay: 2000,
+      replies: [
+        {text: '好', next: 'closing_prep'},
+        {text: '嗯', next: 'closing_prep'}
+      ]
+    },
+    ai_identity: {
+      text: '不甘心代表你在乎。你在乎自己的價值，在乎自己不是白混的。這年頭，連「在乎」都需要勇氣——很多人早就放棄思考這些了。',
+      mood: 'warmth',
+      status: '看到你了',
+      delay: 2200,
+      after: 'insight_identity',
+      replies: [
+        {text: '⋯沒想過可以這樣看', next: 'closing_prep'},
+        {text: '謝了', next: 'closing_prep'}
+      ]
+    },
+
+    // === CAREER BRANCH ===
+    career_stuck: {
+      text: '看不到出路最難受——不是絕望，是那種「好像動一下也不會比較好」的無力感。你現在每天精力都花在哪？',
+      mood: 'thinking',
+      status: '在聽',
+      delay: 2000,
+      replies: [
+        {text: '處理公司的鳥事', next: 'career_daily'},
+        {text: '應付各種人', next: 'career_daily'},
+        {text: '裝作一切正常', next: 'burn_mask'}
+      ],
+      allowFree: true
+    },
+    career_want: {
+      text: '「不知道自己要什麼」——這句話聽起來很普通，但說出來的時候其實很重。你最近有什麼事讓你覺得，哪怕只有一秒，是不討厭的？',
+      mood: 'listening',
+      status: '想聽',
+      delay: 2200,
+      replies: [
+        {text: '想不到', next: 'mean_empty'},
+        {text: '跟小孩在一起的時候吧', next: 'family_anchor'},
+        {text: '偶爾幫到人的時候', next: 'career_meaning'}
+      ],
+      allowFree: true
+    },
+    career_age: {
+      text: '年紀這東西很煩——它不只帶來壓力，還帶來一種「時間不等你」的恐慌。但 30、40 歲的你跟 20 歲不一樣——你的焦慮更真實，但你做決定的底氣也更厚。只是你現在太焦慮，看不到而已。',
+      mood: 'empathy',
+      status: '理解中',
+      delay: 2300,
+      after: 'insight_age',
+      replies: [
+        {text: '是啊⋯', next: 'closing_prep'},
+        {text: '我就是怕來不及', next: 'career_time'}
+      ]
+    },
+    career_daily: {
+      text: '所以你每天的電量都在消耗，但沒在充。怪不得覺得卡——手機 3% 電量你也不會期待它跑什麼大型 App 吧。',
+      mood: 'empathy',
+      status: '懂了',
+      delay: 1800,
+      replies: [
+        {text: '這比喻也太精準', next: 'closing_prep'},
+        {text: '那怎麼充電', next: 'ai_practical'}
+      ]
+    },
+    career_meaning: {
+      text: '幫到別人的那個感覺——記住它。這是一條線索。你不用現在就想清楚，但那個瞬間裡藏著一些關於「你到底在乎什麼」的答案。',
+      mood: 'warmth',
+      status: '有發現',
+      delay: 2000,
+      after: 'insight_meaning',
+      replies: [
+        {text: '嗯，我想想', next: 'closing_prep'},
+        {text: '想歸想，飯還是要吃', next: 'ai_practical'}
+      ]
+    },
+    career_time: {
+      text: '「來不及」這三個字，有時候是真的，但多數時候是焦慮偽裝成事實在嚇你。你今天能在這裡面對它，就代表你沒有放棄。',
+      mood: 'warmth',
+      status: '認真的',
+      delay: 2000,
+      replies: [
+        {text: '好吧', next: 'closing_prep'},
+        {text: '⋯嗯', next: 'closing_prep'}
+      ]
+    },
+
+    // === BURNOUT BRANCH ===
+    burn_body: {
+      text: '身體不會騙人。你的肩膀硬不硬？睡前腦子會不會關不掉？最近睡得怎樣？',
+      mood: 'empathy',
+      status: '在乎你',
+      delay: 1500,
+      replies: [
+        {text: '睡不好', next: 'burn_sleep'},
+        {text: '累到不行但躺下睡不著', next: 'burn_sleep'},
+        {text: '還行吧', next: 'burn_emotional'}
+      ]
+    },
+    burn_emotional: {
+      text: '心裡的累最麻煩，因為驗血報告看不出來、請假也不知道要寫什麼假。但它是真的在消耗你。如果現在可以做任何事，你想幹嘛？',
+      mood: 'empathy',
+      status: '陪著',
+      delay: 2000,
+      replies: [
+        {text: '放空', next: 'burn_rest'},
+        {text: '消失幾天', next: 'burn_escape'},
+        {text: '不知道', next: 'silence1'}
+      ],
+      allowFree: true
+    },
+    burn_mask: {
+      text: '每天都在演技大賽——同事問「還好嗎」，你說「還行啊」。你知道光是「裝沒事」這件事有多耗電嗎？這是隱形的加班。',
+      mood: 'empathy',
+      status: '看穿了',
+      delay: 2000,
+      after: 'mood_check',
+      replies: [
+        {text: '真的累爆', next: 'tired_core'},
+        {text: '不演不行啊', next: 'mask_deeper'}
+      ]
+    },
+    burn_sleep: {
+      text: '睡眠是最誠實的測謊機。你的身體已經在說「夠了」，但你的大腦還在加班。上次真正放鬆是什麼時候？不是那種躺在沙發滑手機的放鬆。',
+      mood: 'empathy',
+      status: '關心中',
+      delay: 2000,
+      after: 'breathe_suggest',
+      replies: [
+        {text: '⋯不記得了', next: 'closing_prep'},
+        {text: '很久了', next: 'closing_prep'}
+      ]
+    },
+    burn_rest: {
+      text: '放空是正確答案。你現在什麼都不用做。就在這裡待著就好。我也不會一直說話煩你。',
+      mood: 'listening',
+      status: '靜靜的',
+      delay: 3000,
+      after: 'breathe_offer',
+      replies: [
+        {text: '⋯嗯', next: 'closing_prep'},
+        {text: '⋯謝', next: 'closing_prep'}
+      ]
+    },
+    burn_escape: {
+      text: '想消失不代表你不想活——只是想從現在這個狀態裡逃出來。這念頭你常有嗎？',
+      mood: 'empathy',
+      status: '認真問',
+      delay: 2000,
+      replies: [
+        {text: '偶爾', next: 'burn_check'},
+        {text: '蠻常的', next: 'burn_check'},
+        {text: '沒那麼嚴重啦', next: 'burn_rest'}
+      ]
+    },
+    burn_check: {
+      text: '謝謝你願意說。直接問你一下——有沒有想過傷害自己？問這個不是要嚇你，是因為我在乎。',
+      mood: 'empathy',
+      status: '很在乎',
+      delay: 2500,
+      replies: [
+        {text: '沒有', next: 'burn_rest'},
+        {text: '偶爾會閃過', next: 'safety_trigger'},
+        {text: '有', next: 'safety_trigger'}
+      ]
+    },
+    mask_deeper: {
+      text: '不演不行——因為你怕被看見脆弱。大叔的世界沒有「我今天心情不好」這個選項。但在這裡不用演。我又不會給你打考績。',
+      mood: 'warmth',
+      status: '放心',
+      delay: 2000,
+      replies: [
+        {text: '⋯', next: 'tired_core'},
+        {text: '好', next: 'deeper1'}
+      ]
+    },
+    tired_core: {
+      text: '你累的不是工作量，是「假裝不累」這件事。今天你能承認「我很累」——光這句話，很多大叔一輩子都說不出來。',
+      mood: 'warmth',
+      status: '敬你一杯',
+      delay: 2200,
+      after: 'breathe_suggest',
+      replies: [
+        {text: '⋯嗯', next: 'closing_prep'},
+        {text: '我不覺得這有什麼了不起', next: 'courage1'}
+      ]
+    },
+    courage1: {
+      text: '你不覺得了不起，正好說明你把扛壓當正常。但能面對自己不 OK 這件事，就是一種力量。不用覺得了不起，但也別小看它。',
+      mood: 'warmth',
+      status: '真心的',
+      delay: 1800,
+      replies: [
+        {text: '好吧', next: 'closing_prep'},
+        {text: '⋯', next: 'closing_prep'}
+      ]
+    },
+
+    // === MEANING BRANCH ===
+    mean_work: {
+      text: '覺得工作沒意義——是工作本身在浪費你的生命，還是你在工作裡找不到自己的位置？這兩個長得很像，但不一樣。',
+      mood: 'thinking',
+      status: '釐清中',
+      delay: 2000,
+      replies: [
+        {text: '好像是後者', next: 'mean_self'},
+        {text: '工作本身就是在浪費生命', next: 'mean_waste'}
+      ]
+    },
+    mean_life: {
+      text: '「人生有什麼意義」——哲學系唸四年也答不了的題目，你別太苛求自己。但你會去想，表示你還在乎。你身邊很多人早就自動導航了，連問都懶得問。',
+      mood: 'empathy',
+      status: '理解的',
+      delay: 2200,
+      replies: [
+        {text: '在乎有屁用', next: 'mean_empty'},
+        {text: '⋯也是', next: 'closing_prep'}
+      ]
+    },
+    mean_empty: {
+      text: '什麼都有了但不快樂——這種空虛比缺錢更難處理。因為你連抱怨的資格都被剝奪了：「你都有房有車有老婆了還不滿足？」但感覺是真的，不需要理由。',
+      mood: 'empathy',
+      status: '懂這個',
+      delay: 2300,
+      after: 'insight_empty',
+      replies: [
+        {text: '嗯', next: 'closing_prep'},
+        {text: '那怎麼辦', next: 'mean_next'}
+      ]
+    },
+    mean_self: {
+      text: '在工作裡失去位置感——明明人在那裡，但覺得有你沒你好像都一樣。那不是能力的問題，是連結斷了。你跟工作的關係，像一段已經沒感覺的婚姻。',
+      mood: 'empathy',
+      status: '看到了',
+      delay: 2200,
+      after: 'insight_meaning',
+      replies: [
+        {text: '⋯精準', next: 'closing_prep'},
+        {text: '是啊', next: 'closing_prep'}
+      ]
+    },
+    mean_waste: {
+      text: '如果你真的覺得是在浪費生命——那你心裡有沒有一個「其實我想做⋯⋯」的念頭？不用說得很具體，模模糊糊的也算。',
+      mood: 'thinking',
+      status: '好奇中',
+      delay: 2000,
+      replies: [
+        {text: '真的不知道', next: 'mean_empty'},
+        {text: '有，但不敢', next: 'mean_dare'}
+      ],
+      allowFree: true
+    },
+    mean_dare: {
+      text: '不敢——是怕失敗，還是怕萬一成功了才發現那也不是你要的？兩種都怕的話，恭喜你，你是正常人。今天先記住這個念頭就好，不用做決定。',
+      mood: 'warmth',
+      status: '不急',
+      delay: 2500,
+      replies: [
+        {text: '好', next: 'closing_prep'},
+        {text: '⋯', next: 'closing_prep'}
+      ]
+    },
+    mean_next: {
+      text: '沒有標準答案，有的話早就有人賣了。但有一個小練習：從明天開始，注意一下什麼事讓你覺得「欸，這個不討厭」。不用分析、不用行動，光注意就好。',
+      mood: 'warmth',
+      status: '給你帶走',
+      delay: 2500,
+      replies: [
+        {text: '試試看', next: 'closing_prep'},
+        {text: '好', next: 'closing_prep'}
+      ]
+    },
+
+    // === CHAT BRANCH ===
+    chat_work: {
+      text: '公司的鳥事——隨便靠北，我不會告訴你老闆。最近什麼事讓你最煩？',
+      mood: 'listening',
+      status: '聽著',
+      delay: 1500,
+      replies: [
+        {text: '人的問題', next: 'career_daily'},
+        {text: '案子壓力', next: 'burn_emotional'},
+        {text: '前途的問題', next: 'career_want'}
+      ],
+      allowFree: true
+    },
+    chat_life: {
+      text: '生活的事。最近有什麼一直卡在心裡，想到就有點煩的？',
+      mood: 'listening',
+      status: '聽著',
+      delay: 1500,
+      replies: [
+        {text: '家庭', next: 'family_anchor'},
+        {text: '感情', next: 'relationship1'},
+        {text: '說不上來，就是空空的', next: 'mean_empty'}
+      ],
+      allowFree: true
+    },
+    chat_vague: {
+      text: '說不清楚的悶最難受——因為連 Google 都搜不到解法。不用急著定義它，我們就從這個悶開始。',
+      mood: 'empathy',
+      status: '陪著',
+      delay: 2000,
+      after: 'mood_check',
+      replies: [
+        {text: '嗯', next: 'post_mood'},
+        {text: '⋯', next: 'silence1'}
+      ]
+    },
+
+    // === SHARED NODES ===
+    family_anchor: {
+      text: '家人是你的支撐，但有時候也是壓力的來源——因為你什麼都想給他們最好的。扛久了會忘記你自己也需要被照顧。',
+      mood: 'warmth',
+      status: '理解',
+      delay: 2000,
+      replies: [
+        {text: '對', next: 'closing_prep'},
+        {text: '我不確定自己夠不夠好', next: 'enough1'}
+      ]
+    },
+    relationship1: {
+      text: '感情的事最難講。有時候跟最親近的人之間，反而有最大的距離。你不想聊也沒關係，點到就好。',
+      mood: 'empathy',
+      status: '尊重你',
+      delay: 1800,
+      replies: [
+        {text: '嗯', next: 'closing_prep'},
+        {text: '不聊這個了', next: 'deeper1'}
+      ]
+    },
+    enough1: {
+      text: '「我夠不夠好」——會問這個問題的人，通常都已經夠好了。只是你拿來衡量自己的尺，比量別人的嚴格十倍。',
+      mood: 'warmth',
+      status: '真的',
+      delay: 2500,
+      after: 'insight_identity',
+      replies: [
+        {text: '⋯謝', next: 'closing_prep'},
+        {text: '好吧', next: 'closing_prep'}
+      ]
+    },
+    post_mood: {
+      text: '收到。不管現在分數多少，你願意在這裡待一下，就很好了。要繼續聊還是今天先這樣？',
+      mood: 'warmth',
+      status: '隨你',
+      delay: 1800,
+      replies: [
+        {text: '繼續', next: 'deeper1'},
+        {text: '今天先這樣', next: 'closing_prep'}
+      ]
+    },
+
+    // === SAFETY ===
+    safety_trigger: {
+      text: '謝謝你願意說這個。我是 AI，能做的有限——但有人可以幫你，他們比我專業得多。',
+      mood: 'alert',
+      status: '重要',
+      delay: 1500,
+      after: 'show_safety',
+      replies: [
+        {text: '我知道了', next: 'burn_rest'},
+        {text: '謝謝', next: 'burn_rest'}
+      ]
+    },
+
+    // === CLOSING — 漸進式讀懂 + 帶走一句話 + 大叔惺惺相惜 ===
+    closing_prep: {
+      text: getClosingPrepText(),
+      mood: 'warmth',
+      status: '兄弟講句真的',
+      delay: 2000,
+      replies: [
+        {text: '嗯，聽你說', next: 'closing_suggest'},
+        {text: '今天先這樣就好', next: 'closing_final'}
+      ]
+    },
+    closing_suggest: {
+      text: getClosingSuggestText(),
+      mood: 'warmth',
+      status: '大叔經驗談',
+      delay: 2500,
+      replies: [
+        {text: '有道理', next: 'closing_final'},
+        {text: '我試試', next: 'closing_final'}
+      ]
+    },
+    closing_final: {
+      text: '大叔們不用互相加油——我們只需要知道，有人懂就好了。下次悶了再過來，這裡沒有營業時間。',
+      mood: 'warmth',
+      status: '掰了兄弟',
+      delay: 2500,
+      after: 'end_session',
+      replies: []
+    }
+  };
+}
+
+// ===== NAVIGATION ENGINE =====
+function navigateTo(nodeId){
+  if(!conversationTree[nodeId]) return;
+  currentNode = conversationTree[nodeId];
+  messageCount++;
+
+  // Check for deep response
+  if(['ai_core','ai_identity','tired_core','mean_self','mean_empty','loneliness1','enough1'].includes(nodeId)){
+    deepResponseCount++;
+  }
+
+  // Set mood
+  if(currentNode.mood) setMood(currentNode.mood);
+  if(currentNode.status){
+    document.getElementById('orbStatus').textContent = currentNode.status;
+  }
+
+  // Hide choices, show typing
+  hideChoices();
+  hideWhisperInput();
+  showTyping();
+
+  const delay = currentNode.delay || 1800;
+
+  setTimeout(() => {
+    hideTyping();
+    showVoice(currentNode.text, () => {
+      // After text shown, check for special actions
+      if(currentNode.after === 'mood_check'){
+        setTimeout(() => showMoodCheck(), 1200);
+      } else if(currentNode.after === 'breathe_suggest'){
+        setTimeout(() => showBreatheSuggest(), 1000);
+      } else if(currentNode.after === 'breathe_offer'){
+        setTimeout(() => startBreathe(), 1500);
+      } else if(currentNode.after === 'show_safety'){
+        showSafety();
+        setTimeout(() => showReplies(), 1500);
+      } else if(currentNode.after === 'end_session'){
+        setTimeout(() => endSession(), 2500);
+      } else if(currentNode.after && currentNode.after.startsWith('insight_')){
+        const insightKey = currentNode.after.replace('insight_','');
+        setTimeout(() => showInsightByKey(insightKey), 1200);
+      } else {
+        // Show replies
+        setTimeout(() => showReplies(), 800);
+      }
+    });
+  }, delay);
+}
+
+// ===== VOICE (floating text) =====
+let typewriterTimer = null;
+function showVoice(text, callback){
+  // Cancel any in-progress typewriter
+  if(typewriterTimer) clearTimeout(typewriterTimer);
+  const el = document.getElementById('voiceText');
+  el.className = 'voice-text';
+  el.textContent = '';
+
+  // Typewriter effect
+  let i = 0;
+  el.classList.add('visible');
+  const speed = 45;
+  function type(){
+    if(i < text.length){
+      el.textContent += text.charAt(i);
+      i++;
+      typewriterTimer = setTimeout(type, speed);
+    } else {
+      typewriterTimer = null;
+      if(callback) setTimeout(callback, 400);
+    }
+  }
+  type();
+}
+
+function fadeVoice(){
+  const el = document.getElementById('voiceText');
+  el.classList.remove('visible');
+  el.classList.add('fading');
+  setTimeout(() => {
+    el.classList.remove('fading');
+    el.textContent = '';
+  }, 600);
+}
+
+// ===== CHOICES =====
+let isNavigating = false; // Prevent double-click
+function showReplies(){
+  if(!currentNode || !currentNode.replies || currentNode.replies.length === 0) return;
+  isNavigating = false; // Re-enable clicks
+
+  const ring = document.getElementById('choicesRing');
+  ring.innerHTML = '';
+
+  currentNode.replies.forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-pill';
+    btn.textContent = r.text;
+    btn.onclick = () => {
+      if(isNavigating) return; // Prevent double-click
+      isNavigating = true;
+      spawnMiniOrb(r.next);
+      fadeVoice();
+      hideChoices();
+      hideWhisperInput();
+      setTimeout(() => navigateTo(r.next), 600);
+    };
+    ring.appendChild(btn);
+  });
+
+  ring.classList.add('visible');
+
+  if(currentNode.allowFree){
+    setTimeout(() => showWhisperInput(), 300);
+  }
+}
+
+function hideChoices(){
+  const ring = document.getElementById('choicesRing');
+  ring.classList.remove('visible');
+  setTimeout(() => { ring.innerHTML = ''; }, 400);
+}
+
+// ===== WHISPER INPUT =====
+function showWhisperInput(){
+  document.getElementById('whisperInput').classList.add('visible');
+}
+function hideWhisperInput(){
+  document.getElementById('whisperInput').classList.remove('visible');
+}
+
+function sendWhisper(){
+  const field = document.getElementById('whisperField');
+  const text = field.value.trim();
+  if(!text) return;
+  field.value = '';
+  hasUsedFreeText = true;
+
+  fadeVoice();
+  hideChoices();
+  hideWhisperInput();
+
+  // Show user text briefly as the voice
+  const el = document.getElementById('voiceText');
+  el.textContent = text;
+  el.className = 'voice-text visible';
+  el.style.color = 'hsla(var(--orb-h),60%,80%,0.6)';
+
+  setTimeout(() => {
+    el.style.color = '';
+    fadeVoice();
+    // Process free text
+    const next = processFreeText(text);
+    // Spawn mini-orb from whisper input area
+    spawnMiniOrb(next);
+    setTimeout(() => navigateTo(next), 600);
+  }, 1500);
+}
+
+document.getElementById('whisperField').addEventListener('keydown', e => {
+  if(e.key === 'Enter') sendWhisper();
+});
+
+function processFreeText(text){
+  const t = text.toLowerCase();
+  // Safety check first — stricter patterns to avoid false positives (笑死、死線)
+  if(/自殺|不想活|想死[^線]|去死|結束生命|跳樓|跳下去|活不下去|不在了/.test(t)) return 'safety_trigger';
+  if(/ai|自動化|機器|取代|chatgpt/.test(t)) return 'ai_replace';
+  if(/累|疲|撐|受不了|爆|崩/.test(t)) return 'tired_core';
+  if(/不知道|迷|惘|方向|茫/.test(t)) return 'mean_empty';
+  if(/老闆|公司|主管|同事/.test(t)) return 'career_daily';
+  if(/老婆|太太|先生|另一半|女友|男友/.test(t)) return 'relationship1';
+  if(/小孩|孩子|家人|爸|媽/.test(t)) return 'family_anchor';
+  if(/錢|薪|房貸|貸款/.test(t)) return 'ai_practical';
+  if(/謝|感謝|感恩/.test(t)) return 'closing_prep';
+  if(/孤|獨|一個人/.test(t)) return 'loneliness1';
+  if(/意義|目的|為什麼/.test(t)) return 'mean_work';
+  if(/怕|害怕|恐/.test(t)) return 'ai_replace';
+  // Default
+  return 'deeper1';
+}
+
+// ===== TYPING INDICATOR =====
+function showTyping(){
+  document.getElementById('typingDots').classList.add('visible');
+  document.getElementById('orbStatus').textContent = '正在思考⋯';
+}
+function hideTyping(){
+  document.getElementById('typingDots').classList.remove('visible');
+}
+
+// ===== MOOD CHECK =====
+function showMoodCheck(){
+  document.getElementById('moodOverlay').classList.add('visible');
+}
+function selectMood(mood){
+  document.getElementById('moodOverlay').classList.remove('visible');
+  // After mood check, show replies for current node
+  setTimeout(() => showReplies(), 600);
+}
+
+// ===== INSIGHT =====
+const insights = {
+  ai: {title:'AI 取代的是任務，不是你', body:'你的焦慮本身就是一種覺察力。麻木的人不會焦慮——他們只會繼續被取代而不自知。你感覺到威脅，是因為你還在乎。這是你跟 AI 最大的不同。'},
+  identity: {title:'你不等於你的職稱', body:'我們習慣把自我價值綁在「能做什麼」上面。一旦那個技能被追上、那個位置被動搖，就覺得整個人在崩。但你不只是一個職位、一個 title。你是一個完整的人——只是你忘了。'},
+  age: {title:'年紀是焦慮，也是底氣', body:'20 歲的焦慮叫迷惘，40 歲的焦慮叫真實。但真實也意味著——你做的每一個選擇都有重量。焦慮告訴你「來不及了」，但事實是：你現在就在做選擇。選擇本身就是力量。'},
+  empty: {title:'空虛是你心裡的鬧鐘', body:'空虛不是「什麼都沒有」。它是你的內心在按鬧鐘：「嘿，該改變一些什麼了。」你聽到了——這就是第一步。大多數人連鬧鐘都聽不到。'},
+  meaning: {title:'意義不是想出來的', body:'與其問「我的人生有什麼意義」，不如注意「什麼東西讓我多看了兩眼」。意義不會像面試通知一樣寄到你信箱——它藏在日常的細節裡，你得自己發現。'}
+};
+
+function showInsightByKey(key){
+  const data = insights[key];
+  if(!data) { showReplies(); return; }
+  document.getElementById('insightTitle').textContent = data.title;
+  document.getElementById('insightBody').textContent = data.body;
+  document.getElementById('insightCard').classList.add('visible');
+  setMood('insight');
+}
+function closeInsight(){
+  document.getElementById('insightCard').classList.remove('visible');
+  setTimeout(() => showReplies(), 400);
+}
+
+// ===== BREATHING =====
+function showBreatheSuggest(){
+  const ring = document.getElementById('choicesRing');
+  ring.innerHTML = '';
+
+  const breatheBtn = document.createElement('button');
+  breatheBtn.className = 'choice-pill';
+  breatheBtn.textContent = '做一個呼吸練習';
+  breatheBtn.onclick = () => { hideChoices(); startBreathe(); };
+  ring.appendChild(breatheBtn);
+
+  if(currentNode && currentNode.replies){
+    currentNode.replies.forEach(r => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-pill';
+      btn.textContent = r.text;
+      btn.onclick = () => {
+        spawnMiniOrb(r.next);
+        fadeVoice();
+        hideChoices();
+        setTimeout(() => navigateTo(r.next), 600);
+      };
+      ring.appendChild(btn);
+    });
+  }
+  ring.classList.add('visible');
+}
+
+let breatheTimer = null;
+function startBreathe(){
+  const overlay = document.getElementById('breatheOverlay');
+  const orb = document.getElementById('breatheOrb');
+  const text = document.getElementById('breatheText');
+  overlay.classList.add('visible');
+
+  const phases = [
+    {label:'吸氣', cls:'inhale', dur:4000},
+    {label:'停住', cls:'hold', dur:4000},
+    {label:'吐氣', cls:'exhale', dur:4000}
+  ];
+  let cycle = 0;
+  let phase = 0;
+
+  function runPhase(){
+    if(cycle >= 2){
+      overlay.classList.remove('visible');
+      orb.className = 'breathe-orb';
+      setTimeout(() => showReplies(), 600);
+      return;
+    }
+    const p = phases[phase];
+    orb.className = 'breathe-orb ' + p.cls;
+    orb.textContent = p.label;
+    text.textContent = `第 ${cycle+1} 輪 / 2`;
+
+    breatheTimer = setTimeout(() => {
+      phase++;
+      if(phase >= phases.length){ phase = 0; cycle++; }
+      runPhase();
+    }, p.dur);
+  }
+  runPhase();
+}
+function skipBreathe(){
+  if(breatheTimer) clearTimeout(breatheTimer);
+  document.getElementById('breatheOverlay').classList.remove('visible');
+  document.getElementById('breatheOrb').className = 'breathe-orb';
+  setTimeout(() => showReplies(), 400);
+}
+
+// ===== SAFETY =====
+function showSafety(){
+  document.getElementById('safetyBanner').classList.add('visible');
+}
+function closeSafety(){
+  document.getElementById('safetyBanner').classList.remove('visible');
+}
+
+// ===== END SESSION =====
+function endSession(){
+  sessionActive = false;
+  // Apply blended color to session end orb
+  const endOrb = document.querySelector('#sessionEnd .orb-core');
+  const endGlow = document.querySelector('#sessionEnd .orb-glow');
+  if(endOrb && colorJourney.length > 0){
+    endOrb.style.background = `radial-gradient(circle at 38% 32%,
+      hsla(${Math.round(blendedHue)},${Math.round(blendedSat)}%,${Math.round(blendedLight+13)}%,0.95),
+      hsla(${Math.round(blendedHue)},${Math.round(blendedSat-10)}%,${Math.round(blendedLight)}%,0.7),
+      hsla(${Math.round((blendedHue-40+360)%360)},${Math.round(blendedSat-30)}%,${Math.round(blendedLight-10)}%,0.4))`;
+    endOrb.style.boxShadow = `0 0 40px hsla(${Math.round(blendedHue)},70%,60%,0.4)`;
+    if(endGlow){
+      endGlow.style.background = `radial-gradient(circle,hsla(${Math.round(blendedHue)},60%,55%,0.2) 0%,transparent 70%)`;
+    }
+  }
+
+  // Render color journey dots (each color the orb absorbed)
+  const dotsEl = document.getElementById('journeyDots');
+  dotsEl.innerHTML = '';
+  if(colorJourney.length > 0){
+    colorJourney.forEach((c, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'journey-dot';
+      dot.style.background = `hsl(${Math.round(c.h)},${Math.round(c.s)}%,${Math.round(c.l)}%)`;
+      dot.style.setProperty('--dot-glow', `hsla(${Math.round(c.h)},${Math.round(c.s)}%,${Math.round(c.l)}%,0.4)`);
+      dotsEl.appendChild(dot);
+      // Staggered reveal
+      setTimeout(() => dot.classList.add('show'), 300 + i * 120);
+    });
+    // Last dot = blended final color, larger
+    const finalDot = document.createElement('div');
+    finalDot.className = 'journey-dot';
+    finalDot.style.background = `hsl(${Math.round(blendedHue)},${Math.round(blendedSat)}%,${Math.round(blendedLight)}%)`;
+    finalDot.style.width = '18px'; finalDot.style.height = '18px';
+    finalDot.style.setProperty('--dot-glow', `hsla(${Math.round(blendedHue)},${Math.round(blendedSat)}%,${Math.round(blendedLight)}%,0.5)`);
+    dotsEl.appendChild(finalDot);
+    setTimeout(() => finalDot.classList.add('show'), 300 + colorJourney.length * 120);
+
+    document.getElementById('journeyLabel').textContent = '你今天的情緒旅程';
+  }
+
+  // Show takeaway card
+  const takeaway = document.getElementById('takeawayCard');
+  document.getElementById('takeawayText').textContent = getTakeawayText();
+  setTimeout(() => takeaway.classList.add('visible'), 800 + colorJourney.length * 120);
+
+  document.getElementById('sessionEnd').classList.add('visible');
+}
+// Feedback buttons — delegated click (fixes event bug)
+document.getElementById('feedbackRow').addEventListener('click', function(e){
+  const btn = e.target.closest('.fb-btn');
+  if(!btn) return;
+  document.querySelectorAll('.fb-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+});
+function restartSession(){
+  document.getElementById('sessionEnd').classList.remove('visible');
+  document.getElementById('journeyDots').innerHTML = '';
+  document.getElementById('journeyLabel').textContent = '';
+  document.getElementById('takeawayCard').classList.remove('visible');
+  document.querySelectorAll('.fb-btn').forEach(b => b.classList.remove('selected'));
+  fadeVoice();
+  hideChoices();
+  resetColorJourney();
+  showScene('splash');
+  setMood('neutral');
+}
+
+// ===== GOOGLE LOGIN (POC — localStorage persistence) =====
+function handleGoogleLogin(){
+  // In production: use Google Identity Services / Firebase Auth
+  // POC: simulate login state with localStorage
+  const btn = document.getElementById('googleLoginBtn');
+  btn.innerHTML = '<span style="color:var(--text-soft)">✓ 記憶模式已開啟</span>';
+  btn.style.borderColor = 'hsla(var(--orb-h),50%,60%,0.3)';
+  btn.style.pointerEvents = 'none';
+  // Save session flag
+  try { localStorage.setItem('dashu_remember', 'true'); } catch(e){}
+}
+</script>
+</body>
+</html>
