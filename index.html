@@ -1024,49 +1024,43 @@ function applyBlendedColor(){
   cosmosSat = Math.max(25, s - 15);
 }
 
-// Spawn 1-3 mini-orbs at random positions around the main orb (top/left/right)
-// then fly them into the orb with a suction pull effect
+// Spawn 1-3 mini-orbs around the orb, fly them to the EDGE, absorb on contact
 function spawnMiniOrb(nodeId){
   const color = getNodeColor(nodeId);
-  const orbEl = document.getElementById('compOrb');
-  if(!orbEl) return;
+  const orbSpace = document.getElementById('compOrb');
+  if(!orbSpace) return;
 
-  const universe = document.getElementById('app');
-  const uRect = universe.getBoundingClientRect();
-  const oRect = orbEl.getBoundingClientRect();
-  const targetX = oRect.left + oRect.width / 2 - uRect.left;
-  const targetY = oRect.top + oRect.height / 2 - uRect.top;
+  // All positioning relative to orb-space center
+  const cX = orbSpace.offsetWidth / 2;
+  const cY = orbSpace.offsetHeight / 2;
+  const orbRadius = document.getElementById('compCore').offsetWidth / 2;
 
-  // Spawn 1-3 mini-orbs
   const count = 1 + Math.floor(Math.random() * 3);
-  // Possible spawn zones: top, left, right (not bottom — that's where text is)
   const zones = ['top','left','right'];
 
-  // Start suction pull on main orb
   startSuction();
 
   for(let i = 0; i < count; i++){
     const zone = zones[Math.floor(Math.random() * zones.length)];
-    const delay = i * 180; // Stagger spawns
+    const delay = i * 200;
 
     setTimeout(() => {
-      // Calculate spawn position based on zone
-      let startX, startY;
-      const orbR = 130; // Distance from orb center
-      const jitter = (Math.random() - 0.5) * 60;
+      // Spawn angle based on zone
+      let angle;
+      if(zone === 'top') angle = -Math.PI/2 + (Math.random() - 0.5) * 1.2;
+      else if(zone === 'left') angle = Math.PI + (Math.random() - 0.5) * 1.0;
+      else angle = (Math.random() - 0.5) * 1.0;
 
-      if(zone === 'top'){
-        startX = targetX + jitter;
-        startY = targetY - orbR - Math.random() * 40;
-      } else if(zone === 'left'){
-        startX = targetX - orbR - Math.random() * 40;
-        startY = targetY + jitter * 0.6 - 30;
-      } else {
-        startX = targetX + orbR + Math.random() * 40;
-        startY = targetY + jitter * 0.6 - 30;
-      }
+      // Start position: well outside the orb
+      const spawnDist = orbRadius + 50 + Math.random() * 40;
+      const startX = cX + Math.cos(angle) * spawnDist;
+      const startY = cY + Math.sin(angle) * spawnDist;
 
-      // Slight hue variation per orb for richness
+      // Target: orb EDGE (not center!) — stop just at the surface
+      const edgeDist = orbRadius - 4;
+      const edgeX = cX + Math.cos(angle) * edgeDist;
+      const edgeY = cY + Math.sin(angle) * edgeDist;
+
       const hVar = color.h + (Math.random() - 0.5) * 20;
 
       const mini = document.createElement('div');
@@ -1076,34 +1070,35 @@ function spawnMiniOrb(nodeId){
       mini.style.background = `radial-gradient(circle at 35% 30%,
         hsla(${hVar},${color.s}%,${color.l + 15}%,0.95),
         hsla(${hVar},${color.s}%,${color.l}%,0.7))`;
-      mini.style.boxShadow = `0 0 14px hsla(${hVar},${color.s}%,${color.l}%,0.6),
-        0 0 28px hsla(${hVar},${color.s}%,${color.l}%,0.2)`;
-      universe.appendChild(mini);
+      mini.style.boxShadow = `0 0 16px hsla(${hVar},${color.s}%,${color.l}%,0.7),
+        0 0 32px hsla(${hVar},${color.s}%,${color.l}%,0.3)`;
+      orbSpace.appendChild(mini);
 
       // Phase 1: Spawn pop
-      requestAnimationFrame(() => {
-        mini.classList.add('spawned');
-      });
+      requestAnimationFrame(() => mini.classList.add('spawned'));
 
-      // Phase 2: Fly toward orb center (suction pull)
+      // Phase 2: Fly to orb EDGE
       setTimeout(() => {
         mini.classList.remove('spawned');
         mini.classList.add('flying');
-        mini.style.left = targetX - 9 + 'px';
-        mini.style.top = targetY - 9 + 'px';
-        mini.style.transform = 'scale(0.3)';
-        mini.style.opacity = '0.5';
+        mini.style.left = edgeX - 9 + 'px';
+        mini.style.top = edgeY - 9 + 'px';
+        mini.style.transform = 'scale(0.5)';
+        mini.style.opacity = '0.7';
 
-        // Drop trail particles
-        dropTrail(startX, startY, targetX, targetY, {h:hVar, s:color.s, l:color.l}, universe);
+        dropTrail(startX, startY, edgeX, edgeY, {h:hVar, s:color.s, l:color.l}, orbSpace);
       }, 350);
 
-      // Phase 3: Absorption
+      // Phase 3: Absorbed at edge — dissolve into orb surface
       setTimeout(() => {
         mini.classList.remove('flying');
         mini.classList.add('absorbed');
+        // Slight inward nudge as it dissolves
+        const absX = cX + Math.cos(angle) * (edgeDist - 12);
+        const absY = cY + Math.sin(angle) * (edgeDist - 12);
+        mini.style.left = absX - 9 + 'px';
+        mini.style.top = absY - 9 + 'px';
 
-        // Only trigger full absorption on last orb
         if(i === count - 1){
           triggerAbsorption(color);
           colorJourney.push({h: color.h, s: color.s, l: color.l, weight: 1});
@@ -1113,7 +1108,7 @@ function spawnMiniOrb(nodeId){
         setTimeout(() => {
           if(mini.parentNode) mini.parentNode.removeChild(mini);
         }, 400);
-      }, 1150);
+      }, 1100);
     }, delay);
   }
 }
@@ -1127,13 +1122,12 @@ function startSuction(){
 }
 
 function dropTrail(x1, y1, x2, y2, color, container){
-  const steps = 5;
+  const steps = 4;
   for(let i = 1; i <= steps; i++){
     setTimeout(() => {
       const t = i / (steps + 1);
-      // Slight curve (quadratic bezier feel)
-      const cx = (x1 + x2) / 2 + (Math.random() - 0.5) * 30;
-      const cy = Math.min(y1, y2) - 40;
+      const cx = (x1 + x2) / 2 + (Math.random() - 0.5) * 20;
+      const cy = Math.min(y1, y2) - 25;
       const px = (1-t)*(1-t)*x1 + 2*(1-t)*t*cx + t*t*x2;
       const py = (1-t)*(1-t)*y1 + 2*(1-t)*t*cy + t*t*y2;
 
@@ -1141,13 +1135,13 @@ function dropTrail(x1, y1, x2, y2, color, container){
       dot.className = 'trail-dot';
       dot.style.left = px - 2.5 + 'px';
       dot.style.top = py - 2.5 + 'px';
-      dot.style.background = `hsla(${color.h},${color.s}%,${color.l}%,0.5)`;
+      dot.style.background = `hsla(${color.h},${color.s}%,${color.l}%,0.6)`;
       container.appendChild(dot);
 
       setTimeout(() => {
         if(dot.parentNode) dot.parentNode.removeChild(dot);
       }, 650);
-    }, i * 120);
+    }, i * 100);
   }
 }
 
@@ -1163,6 +1157,16 @@ function triggerAbsorption(color){
   // Add temporary absorption animation
   core.classList.add('absorbing');
   setTimeout(() => core.classList.remove('absorbing'), 700);
+
+  // Trigger liquid morph on absorption — the orb "ripples" as it absorbs
+  const morphClasses = ['morphing','morph-v2','morph-v3'];
+  const cls = morphClasses[Math.floor(Math.random()*morphClasses.length)];
+  setTimeout(() => {
+    core.classList.add(cls);
+    core.classList.add('morph-flash');
+    setTimeout(() => core.classList.remove('morph-flash'), 200);
+    setTimeout(() => core.classList.remove(cls), 950);
+  }, 250);
 
   // Spawn shockwave ring
   const ring = document.createElement('div');
