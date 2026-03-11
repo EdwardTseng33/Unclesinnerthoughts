@@ -56,7 +56,10 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 .orb-anchor .orb-space{pointer-events:auto}
 
 /* ===== ORB — Living Entity System ===== */
-.orb-space{position:relative;width:220px;height:220px;flex-shrink:0}
+.orb-space{position:relative;width:220px;height:220px;flex-shrink:0;overflow:hidden;border-radius:50%}
+/* Hide Google One Tap popup overlay */
+#credential_picker_container,.S9gUrf-YoZ4jf,iframe[src*="accounts.google.com"]{
+  position:fixed!important;top:0!important;right:0!important;z-index:1000!important}
 .orb-core{position:absolute;top:50%;left:50%;width:160px;height:160px;
   transform:translate(-50%,-50%);border-radius:50%;
   background:radial-gradient(circle at 38% 32%,
@@ -299,27 +302,27 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 #splash .tag-icon:hover{transform:translateY(-2px);border-color:hsla(var(--orb-h),35%,45%,0.25);
   box-shadow:0 4px 16px hsla(var(--orb-h),40%,40%,0.08)}
 #splash .tag-label{font-size:0.68rem;color:var(--text-ghost);letter-spacing:0.08em;opacity:0.8}
-/* Shared button base for splash */
-#splash .splash-btn{padding:0.9rem 2.8rem;border-radius:14px;
-  font-size:0.95rem;font-weight:400;cursor:pointer;font-family:inherit;
+/* Shared button base for splash — consistent sizing */
+#splash .splash-btn{padding:0.75rem 2.4rem;border-radius:12px;
+  font-size:0.9rem;font-weight:400;cursor:pointer;font-family:inherit;
   transition:all 0.4s cubic-bezier(0.4,0,0.2,1);letter-spacing:0.04em;
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  backdrop-filter:blur(12px)}
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  backdrop-filter:blur(12px);white-space:nowrap}
 /* Primary CTA — 進來坐 / 繼續聊 */
 #splash .enter-btn{border:none;
-  background:linear-gradient(135deg,hsla(var(--orb-h),60%,50%,0.85),hsla(var(--orb-h),70%,38%,0.9));
-  color:#fff;box-shadow:0 4px 24px hsla(var(--orb-h),65%,45%,0.2),0 0 48px hsla(var(--orb-h),55%,35%,0.08);
+  background:linear-gradient(135deg,hsla(var(--orb-h),55%,48%,0.8),hsla(var(--orb-h),65%,36%,0.85));
+  color:#fff;box-shadow:0 2px 16px hsla(var(--orb-h),60%,40%,0.18),0 0 40px hsla(var(--orb-h),50%,30%,0.06);
   font-weight:500}
-#splash .enter-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px hsla(var(--orb-h),65%,45%,0.3),0 0 64px hsla(var(--orb-h),55%,35%,0.12)}
+#splash .enter-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px hsla(var(--orb-h),60%,40%,0.25),0 0 56px hsla(var(--orb-h),50%,30%,0.1)}
 #splash .enter-btn:active{transform:translateY(0);transition:all 0.1s}
 /* Privacy note */
-#splash .privacy-note{margin-top:1.2rem;font-size:0.72rem;color:var(--text-ghost);display:flex;align-items:center;gap:5px;
-  letter-spacing:0.02em;opacity:0.6}
+#splash .privacy-note{margin-top:1rem;font-size:0.68rem;color:var(--text-ghost);display:flex;align-items:center;gap:5px;
+  letter-spacing:0.02em;opacity:0.5}
 
 /* ===== GOOGLE LOGIN — same width as CTA ===== */
-.google-login-btn{margin-top:0.6rem;padding:0.75rem 1.8rem;border-radius:14px;
+.google-login-btn{margin-top:0.5rem;padding:0.65rem 2.0rem;border-radius:12px;
   background:hsla(0,0%,100%,0.04);border:1px solid hsla(0,0%,100%,0.08);
-  color:var(--text-soft);font-size:0.8rem;font-family:inherit;cursor:pointer;
+  color:var(--text-soft);font-size:0.82rem;font-family:inherit;cursor:pointer;
   display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:all 0.3s;
   backdrop-filter:blur(12px);letter-spacing:0.02em;white-space:nowrap}
 .google-login-btn:hover{background:hsla(0,0%,100%,0.08);border-color:hsla(0,0%,100%,0.14);
@@ -483,7 +486,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   #splash .splash-sub{font-size:0.9rem;line-height:1.8;max-width:270px}
   #splash .splash-tagline{gap:1.4rem;margin-top:1.6rem;margin-bottom:2rem}
   #splash .tag-icon{width:40px;height:40px;font-size:16px}
-  #splash .enter-btn{padding:0.9rem 2.8rem;font-size:0.98rem}
+  #splash .enter-btn{padding:0.7rem 2.2rem;font-size:0.88rem}
   /* Context scene tighter */
   .ctx-question{font-size:1.12rem;margin-bottom:1.2rem}
   .ctx-options{gap:6px}
@@ -686,7 +689,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 .user-avatar-bar.visible{display:flex}
 .user-avatar-bar img{width:24px;height:24px;border-radius:50%;border:1px solid hsla(var(--orb-h),25%,40%,0.15)}
 .user-avatar-bar span{font-size:0.72rem;color:var(--text-ghost);letter-spacing:0.02em}
-.welcome-back-msg{font-size:0.88rem;color:var(--text-soft);margin-bottom:0.2rem;opacity:0;
+.welcome-back-msg{font-size:0.85rem;color:var(--text-soft);margin-bottom:0.8rem;margin-top:0.2rem;opacity:0;
   transition:opacity 1s ease;font-weight:300;letter-spacing:0.03em}
 .welcome-back-msg.visible{opacity:0.8}
 .logout-link{font-size:0.65rem;color:var(--text-ghost);cursor:pointer;margin-top:0.4rem;
@@ -1609,49 +1612,49 @@ function buildConversationTree(){
   // Dynamic opening based on context — 大叔語氣版
   const openings = {
     ai: {
-      boss: '你自己開公司，理論上你該是最快導入 AI 的人。但說實話，光是搞懂哪些能用、哪些是噱頭，就夠燒腦了。更怕的是——萬一你的團隊被 AI 取代了，那你這個老闆管誰？',
-      tech: '每天都有新的 AI 工具跑出來搶戲。寫了十年 code 的你，突然覺得自己跟一個剛出生三個月的語言模型在搶同一碗飯⋯⋯很荒謬，但也很真實。',
-      pm: '產品經理最怕被問「這個 AI 能不能做？」你心裡想說：我連 AI 到底能做什麼都還在搞清楚，怎麼每個人都覺得我應該知道？',
-      finance: '考了一堆證照，熬了多少夜，結果 AI 說它也會做財報分析。你心裡大概在想：「所以我這些年是在⋯⋯？」',
-      hr: '招人、看履歷、安排面試——AI 說這些它全包了。但人的溫度呢？你花了這麼多年學會「看人」，難道也要被演算法取代？',
-      design: '三秒出一張圖、十秒做一個 logo。AI 生成的東西越來越像回事，你心裡的不安不是怕它好，是怕老闆分不出差別。',
-      sales: '客戶關係經營了這麼久，結果有人跟你說 AI chatbot 就能搞定。你知道那不一樣，但你怕老闆不知道。'
+      boss: '現在 AI Agent 直接能跑完一整條工作流了——你那些月薪五萬的員工能做的事，一個月幾千塊的訂閱就搞定。你不是不想導入，是怕導完之後，公司剩你跟一台電腦面對面。',
+      tech: 'Cursor 寫 code 比你快，Claude 除錯比你穩，Devin 連部署都幫你做了。你十年的經驗在 2026 好像變成「資深打字員」的同義詞。最幹的是——你還得教新人怎麼用這些工具取代你。',
+      pm: '老闆看了一場 AI demo 回來就問你「我們產品什麼時候加 AI？」你想說：加什麼 AI？連 user story 都還沒寫完。但 2026 了，不會講 AI 的 PM 好像就不配開口。',
+      finance: 'AI 現在連審計底稿都能跑了，四大的實習生已經在用 AI 出報告。你考了十年的證照，好像比不上人家裝一個外掛。最氣的是——你知道那個報告有問題，但沒人在乎。',
+      hr: '現在 AI 面試官已經在篩履歷了，連第一輪面談都能做。你花了十幾年練出來的「看人眼光」，被一個演算法用三秒鐘比下去。但你知道它看不出那些字面以外的東西⋯⋯對吧？',
+      design: 'Midjourney v7 出圖比你快一百倍，客戶還覺得「差不多啊」。你花三天磨的排版，AI 三分鐘就生出來了。你怕的不是 AI 好——是怕這個世界越來越分不清什麼叫好。',
+      sales: 'AI SDR 一天能打一千通電話、寫一千封客製信。你一天拜訪三個客戶就累得跟狗一樣。老闆開始問你：「那你的價值在哪？」你知道答案，但 2026 好像沒人要聽。'
     },
     career: {
-      boss: '當老闆的不會跟人說自己迷路。但你心裡清楚——公司好像在走，但你不確定方向對不對。最孤獨的不是失敗，是成功了卻不知道下一步。',
-      tech: '科技圈最愛講「持續成長」——LinkedIn 上每個人都在成長、都在突破，你滑完覺得全世界都在進步，只有你在原地。但你心裡知道，光是「維持不倒」就已經很累了。',
-      pm: '產品做了一個又一個，但你開始懷疑——這些功能真的改變了什麼嗎？還是你只是在幫公司把數字往上推？',
-      finance: '金融這條路看起來穩到不行，但穩到你快窒息了。想動又不敢動，不動又覺得在慢性死亡。',
-      hr: '人資做久了，幫別人做職涯規劃做得很順，但你自己的職涯呢？上次認真想過是什麼時候？',
-      design: '設計師的天花板好像特別低。不是你不夠好，是這個環境不太懂怎麼給你往上走的路。',
-      sales: '業績年年扛，今年比去年高，明年比今年更高。你不是不能跑，是開始質疑這條跑道通往哪裡。'
+      boss: '2026 了，你的公司還活著就算贏。但你心裡清楚——活著跟活得好是兩回事。每天看新聞說哪家又倒了、哪家又裁了，你不是怕倒，是怕自己變成下一個被報導的「曾經風光」。',
+      tech: 'LinkedIn 上每個人都在 po「excited to announce」，你滑完覺得全世界都在跳槽加薪，只有你還在原地寫一樣的 CRUD。但 2026 的科技業也沒那麼好跳了——你卡在「太資深太貴」跟「不夠新不會 AI」之間。',
+      pm: '需求越來越抽象，老闆的願景越來越飄，工程師的耐心越來越薄。你夾在中間已經不是三明治了，是被壓到只剩一層皮。2026 的 PM 還要兼 AI 產品策略師——但薪水沒加。',
+      finance: '這年頭連台積電的股價都能一天噴一天跌，你做的財務預測跟擲筊差不多準。穩定？2026 哪有什麼穩定。你只是太累了不敢動，不動至少不會錯。',
+      hr: '裁員裁到你手軟——每次約人「聊一下」，對方的臉就垮了。2026 的 HR 不是在做人的工作，是在做讓人消失的工作。你幫別人規劃了一輩子，自己的路呢？',
+      design: '設計師的天花板在 2026 好像更低了——AI 能生圖、能排版、能做 prototype。你能做的「只是」有品味，但品味在 KPI 面前一文不值。',
+      sales: '景氣冷到客戶連電話都不接。你的 pipeline 數字很漂亮，但成交率跟台灣的生育率一樣——持續破底。你不是不努力，是整個市場在縮。'
     },
     burnout: {
-      boss: '創業最累的不是工作量，是你的壓力沒有出口。員工可以跟你抱怨，你跟誰抱怨？投資人嗎？',
-      tech: '科技業的速度快到連「我好累」都來不及說，就又來一個 sprint 了。你上次不加班是什麼時候？',
-      pm: '開不完的會、寫不完的 PRD、每個部門都覺得你該幫他們。PM 的全名應該改成 Permanently Multitasking。',
-      finance: '數字、deadline、合規、客戶的情緒、老闆的要求⋯⋯你是在做金融，還是在做人體壓力測試？',
-      hr: '處理別人的情緒是你的工作。但你的情緒呢？人資是全公司最會「假裝沒事」的人，因為你不能不行。',
-      design: '改稿改到第八版，需求一直變，截止日不會變。你的創意已經被消耗殆盡，但還是要裝作靈感無限。',
-      sales: '每個月歸零重來，壓力是月薪附贈的。你不是在賣產品，你是在賣自己的精神健康。'
+      boss: '2026 了你還在自己扛——員工的薪水、客戶的臉色、政府的法規、AI 的衝擊。全部都是你一個人吸收。你跟誰倒垃圾？太太？她聽到公司的事也只能說「辛苦了」。然後你還要反過來安慰她「還好啦」。',
+      tech: '又一個 sprint、又一個 on-call、又一個半夜被叫起來的 P0。2026 的工程師標配：椅子越來越貴、脊椎越來越歪、年假越休越少。你上次連續睡滿六小時是什麼時候？',
+      pm: 'Slack 的紅點永遠清不完，Google Meet 一天排八場，中午吃飯的時間拿來回 comment。2026 的 PM 不只是 Permanently Multitasking——是 Permanently Melting。你已經不是在燃燒，是在融化。',
+      finance: '月底結帳、季報、稅務、合規⋯⋯每一天都像在拆炸彈。2026 法規改了又改，你剛搞懂舊的新的又來了。你不是在做金融，是在做人體版的 Excel——永遠在算，永遠算不完。',
+      hr: '處理別人的離職情緒、調解部門衝突、安撫被裁的同事——然後你回到座位上，假裝自己沒事。2026 的 HR 是全公司最不被允許崩潰的人，因為你崩了誰接？',
+      design: '需求改了八版，Figma 檔案已經有三十幾個 frame 了，PM 還在說「最後一次微調」。你的靈感在第三版就死了，後面五版都是屍體在畫。',
+      sales: '2026 景氣差，客戶預算砍半但你的 quota 沒砍。每個月一號歸零重來的壓力，像是被判了十二次月刑。你不是在賣東西，是在用自己的肝去換業績。'
     },
     meaning: {
-      boss: '公司做起來了，但你偶爾會在深夜問自己：「然後呢？」錢有了、團隊有了，但你好像把自己搞丟了。',
-      tech: '寫了這麼多年的 code，偶爾會在 commit 之後想：「所以呢？這世界有因為這個 feature 變好一點嗎？」',
-      pm: '你推了多少個功能上線，但有哪一個讓你覺得「這很有意義」？產品經理最怕的不是失敗，是成功了卻感覺空空的。',
-      finance: '每天搬別人的錢，處理別人的資產，但回到家突然不知道自己的人生帳戶裡有什麼。',
-      hr: '幫別人找到好工作、處理離職、安排福利。你把公司的人都照顧了一遍，但誰來照顧你？',
-      design: '設計是為了讓世界更好——至少以前你是這樣相信的。現在的你在想，美感這種東西，在這個世界真的重要嗎？',
-      sales: '跑了這麼多客戶、簽了這麼多單，但躺在床上的時候會想：「我不只是一個業績數字吧？」'
+      boss: '公司撐過疫情、撐過升息、撐過 AI 浪潮。2026 了你還在。但你偶爾會在深夜問自己：「然後呢？」營收在長，但你心裡的那個東西在縮。',
+      tech: '寫了十幾年的 code，看著 AI 三秒鐘就能吐出跟你差不多的東西。你不是怕被取代——你是突然不知道自己為什麼還在寫。push 完 code 之後那個空虛感，Google 搜不到答案。',
+      pm: 'DAU 漲了、conversion 上了、OKR 達標了。然後呢？你開始覺得自己像一台推數字的機器，每個 quarter 重複一次。2026 的 KPI 越來越漂亮，但你越來越空。',
+      finance: '別人的資產在你手上來來去去，千萬上億像數字遊戲。但你回到家看著自己的存款，突然不知道這些年的加班是在為誰。2026 物價又漲了，但你的空虛不是錢能填的。',
+      hr: '你幫別人找到夢想中的工作、安排完美的 onboarding、處理無數的心理關懷。但下班之後呢？你的夢想呢？你已經忘了自己當初為什麼選這行了。',
+      design: '以前你相信設計能改變世界。2026 了，你發現設計在大部分公司就是「讓按鈕好看一點」。你開始懷疑——花這麼多年磨的美感，在一個只看數據的世界裡，到底值什麼？',
+      sales: '簽了一張又一張的單，CRM 裡的數字很漂亮。但凌晨兩點躺在床上的時候你會想：我的人生不只是一堆 closed-won 吧？如果把自己從公司裡移除，還剩什麼？'
     },
     chat: {
-      boss: '當老闆的平常哪有機會放鬆聊天？不是在談生意就是在裝鎮定。今天不用當老闆，隨便聊。',
-      tech: '寫 code 的人很少被問「你今天過得怎樣」。反正出 bug 的時候就會有人找你了。今天不聊 bug，聊你。',
-      pm: '平常都在幫別人對齊、幫別人排優先序。今天輪到你——不用排什麼 priority，想到什麼講什麼。',
-      finance: '你的生活大概已經夠嚴肅了。今天不用報告、不用合規、不用算數字。隨便聊。',
-      hr: '你平常都在聽別人講心事。今天角色互換——你說，我聽。',
-      design: '設計師的內心戲通常比作品還豐富。今天不用提案、不用改稿，說說那些畫面背後的你。',
-      sales: '今天不用成交任何人，不用 follow up、不用報業績。就坐下來，聊聊你自己。'
+      boss: '當老闆的平常講的每句話都有目的——跟員工講話是管理、跟客戶講話是生意、跟投資人講話是表演。今天不用有目的，隨便聊。反正我不會跟你要 equity。',
+      tech: '工程師的社交範圍大概就是 Slack 跟 GitHub。上次跟人聊的不是 code review 是什麼時候？今天不聊技術債，聊你自己這個人。',
+      pm: '你的行事曆大概已經排到兩週後了。今天沒有 sync、沒有 standup、沒有 retrospective。你不是 PM，你就是你。想到什麼講什麼。',
+      finance: '你大概已經很久沒有講一句不用精算的話了。今天不用 double check、不用附來源、不用寫 disclaimer。就聊天，不審計。',
+      hr: '你每天都在聽別人倒垃圾。今天輪到你——角色互換。而且我保證不會寫進你的 360 feedback 裡。',
+      design: '設計師的腦袋永遠在運轉——看到路邊招牌字型不對都會抽搐。今天把那個雷達關掉，不用有美感，說說那些沒有被設計過的真心話。',
+      sales: '今天不用 pitch、不用 close、不用 follow up。你的 KPI 在這裡是零。坐下來聊聊那個不用跑客戶的你，長什麼樣子。'
     }
   };
 
@@ -2743,8 +2746,10 @@ function showReturningUI(){
   wb.textContent = pick(msgs);
   setTimeout(() => wb.classList.add('visible'), 300);
 
-  // Change button text
-  document.getElementById('enterBtn').textContent = '繼續聊';
+  // Change button text + tighten layout for returning user
+  const enterBtn = document.getElementById('enterBtn');
+  enterBtn.textContent = '繼續聊';
+  enterBtn.style.marginTop = '0.6rem';
   // Hide first-timer elements for cleaner returning user layout
   document.getElementById('splashSub').style.display = 'none';
   document.getElementById('splashTagline').style.display = 'none';
