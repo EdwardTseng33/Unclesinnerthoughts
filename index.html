@@ -630,11 +630,8 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   letter-spacing:0.02em;font-style:italic}
 
 /* ===== EMOTIONAL ECHO (subtle affirmation below voice text) ===== */
-.emotional-echo{width:100%;text-align:center;padding:0 2rem;
-  font-size:0.72rem;color:var(--text-ghost);letter-spacing:0.08em;opacity:0;
-  transform:translateY(8px);transition:all 1.2s cubic-bezier(0.4,0,0.2,1);
-  pointer-events:none;margin-top:0.8rem;flex-shrink:0}
-.emotional-echo.visible{opacity:0.6;transform:translateY(0)}
+.emotional-echo{display:none}
+/* emotional-echo removed */
 
 /* ===== SESSION TIMER (subtle, top-right) ===== */
 .session-timer{position:absolute;top:1.2rem;right:1.2rem;z-index:6;
@@ -738,7 +735,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 
   <!-- OVERLAYS -->
   <div class="mood-overlay" id="moodOverlay">
-    <div class="mood-q">不用想太多，<br>直覺選一個</div>
+    <div class="mood-q" id="moodPrompt">不用想太多，<br>直覺選一個</div>
     <div class="mood-emojis" id="moodEmojis">
       <div class="mood-emoji" onclick="selectMood('heavy')">😤<span class="ml">壓到爆</span></div>
       <div class="mood-emoji" onclick="selectMood('meh')">😐<span class="ml">行屍走肉</span></div>
@@ -1199,38 +1196,53 @@ function enterSpace(){
 }
 
 // ===== CONTEXT SELECTION =====
+// Random pick helper
+function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
 const contextSteps = [
   {
     label: 'STEP 1/3',
-    question: '最近在煩什麼？',
+    questions: [
+      '最近在煩什麼？',
+      '今天什麼把你帶來這裡的？',
+      '大叔，哪根筋不對勁了？'
+    ],
     options: [
-      {ico:'🤖', text:'AI 要來搶飯碗了是不是', key:'ai'},
-      {ico:'🔄', text:'卡住了，不上不下最難受', key:'career'},
-      {ico:'💥', text:'快爆了，每天都在撐', key:'burnout'},
-      {ico:'🌀', text:'忙了半天不知道在忙什麼', key:'meaning'},
+      {ico:'🤖', text:'AI 要搶飯碗了，我連碗都快端不穩', key:'ai'},
+      {ico:'🔄', text:'升不上去、躺不平，卡在半空最幹', key:'career'},
+      {ico:'💥', text:'每天都在演正常人，快演不下去了', key:'burnout'},
+      {ico:'🌀', text:'忙到沒時間想自己在忙什麼', key:'meaning'},
       {ico:'🍺', text:'沒什麼大事，就想靠北一下', key:'chat'}
     ]
   },
   {
     label: 'STEP 2/3',
-    question: '混哪一行的？',
+    questions: [
+      '混哪一行的？',
+      '平常靠什麼養家糊口？',
+      '名片上印什麼的？'
+    ],
     options: [
-      {ico:'💻', text:'科技／寫 code 的', key:'tech'},
-      {ico:'📊', text:'金融／數字不會騙人那種', key:'finance'},
+      {ico:'💻', text:'科技／寫 code 寫到懷疑人生', key:'tech'},
+      {ico:'📊', text:'金融／數字不會騙人但人會', key:'finance'},
       {ico:'📱', text:'行銷／賣命做創意的', key:'marketing'},
       {ico:'👔', text:'帶人的／夾心餅乾', key:'mgmt'},
-      {ico:'🔹', text:'以上皆非', key:'other'}
+      {ico:'🔹', text:'以上皆非，另一種累', key:'other'}
     ]
   },
   {
     label: 'STEP 3/3',
-    question: '哪個年代的大叔？',
+    questions: [
+      '哪個年代的大叔？',
+      '你的大叔等級？',
+      '出社會幾年了？'
+    ],
     options: [
-      {ico:'🎮', text:'25-30 — 剛踏入社會的菜鳥大叔', key:'25'},
-      {ico:'⚡', text:'31-35 — 什麼都要扛的中堅大叔', key:'31'},
-      {ico:'🏋️', text:'36-40 — 上有老下有小的夾心大叔', key:'36'},
-      {ico:'🥃', text:'41-45 — 資深但迷惘的老江湖', key:'41'},
-      {ico:'🎯', text:'45+ — 看過風浪的老大叔', key:'45+'}
+      {ico:'🎮', text:'25-30 — 菜鳥大叔，社會剛教做人', key:'25'},
+      {ico:'⚡', text:'31-35 — 中堅大叔，什麼都要扛', key:'31'},
+      {ico:'🏋️', text:'36-40 — 夾心大叔，上有老下有小', key:'36'},
+      {ico:'🥃', text:'41-45 — 老江湖，資深但迷惘', key:'41'},
+      {ico:'🎯', text:'45+ — 看過風浪的真大叔', key:'45+'}
     ]
   }
 ];
@@ -1246,7 +1258,7 @@ function startContext(){
 function renderCtxStep(){
   const step = contextSteps[ctxStep];
   document.getElementById('ctxStepLabel').textContent = step.label;
-  document.getElementById('ctxQ').textContent = step.question;
+  document.getElementById('ctxQ').textContent = pick(step.questions);
 
   // dots
   const dotsEl = document.getElementById('ctxDots');
@@ -2124,7 +2136,11 @@ function buildConversationTree(){
       ]
     },
     post_mood: {
-      text: '收到。不管分數多少，你願意在這裡待一下，就比在廁所偷滑手機假裝上廁所強多了。要繼續聊還是今天先收工？',
+      textPool: [
+        '收到。不管分數多少，你願意在這裡待一下，就比在廁所偷滑手機假裝上廁所強多了。要繼續聊還是今天先收工？',
+        '好，記住了。光是願意停下來看看自己，就已經很不簡單了。繼續還是先到這？',
+        '收到。能按下那個數字就代表你還在跟自己對話，這就夠了。要往下聊還是先收工？'
+      ],
       mood: 'warmth',
       status: '隨你',
       delay: 1800,
@@ -2197,7 +2213,7 @@ function navigateTo(nodeId){
   if(currentNode.mood){
     setMood(currentNode.mood);
     if(['empathy','warmth'].includes(currentNode.mood) && messageCount > 2){
-      showEmotionalEcho(currentNode.mood);
+      // emotional-echo removed
     }
   }
   if(currentNode.status){
@@ -2213,7 +2229,8 @@ function navigateTo(nodeId){
 
   setTimeout(() => {
     hideTyping();
-    showVoice(currentNode.text, () => {
+    const nodeText = currentNode.textPool ? pick(currentNode.textPool) : currentNode.text;
+    showVoice(nodeText, () => {
       // After text shown, check for special actions
       if(currentNode.after === 'mood_check'){
         setTimeout(() => showMoodCheck(), 1200);
@@ -2381,6 +2398,13 @@ function hideTyping(){
 
 // ===== MOOD CHECK =====
 function showMoodCheck(){
+  const prompts = [
+    '不用想太多，<br>直覺選一個',
+    '沒有標準答案，<br>選最接近的就好',
+    '深呼吸，<br>現在感覺怎麼樣？',
+    '不用美化，<br>真實的就好'
+  ];
+  document.getElementById('moodPrompt').innerHTML = pick(prompts);
   document.getElementById('moodOverlay').classList.add('visible');
 }
 let userMoodScore = 5; // 1-10, default mid
