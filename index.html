@@ -75,19 +75,20 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 .orb-core::before{content:'';position:absolute;top:-20%;left:-20%;width:140%;height:140%;
   border-radius:50%;
   background:radial-gradient(circle at 35% 30%,
-    rgba(255,255,255,0.5) 0%,
-    rgba(255,255,255,0.22) 25%,
+    rgba(255,255,255,0.6) 0%,
+    rgba(255,255,255,0.3) 25%,
     transparent 55%);
-  animation:orbLightRotate 8s ease-in-out infinite;
+  animation:orbLightRotate 6s ease-in-out infinite;
   pointer-events:none}
 
 /* Internal caustics / shimmer layer */
 .orb-core::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;
   border-radius:50%;
   background:
-    radial-gradient(ellipse at 65% 70%, rgba(255,255,255,0.18) 0%, transparent 45%),
-    radial-gradient(ellipse at 25% 55%, rgba(255,255,255,0.14) 0%, transparent 40%);
-  animation:orbCaustics 6s ease-in-out infinite alternate;
+    radial-gradient(ellipse at 65% 70%, rgba(255,255,255,0.28) 0%, transparent 50%),
+    radial-gradient(ellipse at 25% 55%, rgba(255,255,255,0.22) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.15) 0%, transparent 40%);
+  animation:orbCaustics 4.5s ease-in-out infinite alternate;
   mix-blend-mode:soft-light;pointer-events:none}
 
 .orb-glow{position:absolute;top:50%;left:50%;width:200px;height:200px;
@@ -111,33 +112,35 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 /* === Core keyframes === */
 @keyframes orbBreathe{
   0%{transform:translate(-50%,-50%) scale(1) translateY(0) rotate(0deg)}
-  15%{transform:translate(-50%,-50%) scale(1.04) translateY(-6px) rotate(0.8deg)}
-  30%{transform:translate(-50%,-50%) scale(1.065) translateY(-9px) rotate(0deg)}
-  50%{transform:translate(-50%,-50%) scale(1.02) translateY(-3px) rotate(-0.5deg)}
-  70%{transform:translate(-50%,-50%) scale(0.96) translateY(4px) rotate(0.3deg)}
-  85%{transform:translate(-50%,-50%) scale(0.985) translateY(2px) rotate(-0.2deg)}
+  12%{transform:translate(-50%,-50%) scale(1.06) translateY(-8px) rotate(1.2deg)}
+  28%{transform:translate(-50%,-50%) scale(1.09) translateY(-12px) rotate(-0.5deg)}
+  45%{transform:translate(-50%,-50%) scale(1.03) translateY(-4px) rotate(0.8deg)}
+  60%{transform:translate(-50%,-50%) scale(0.94) translateY(6px) rotate(-0.6deg)}
+  78%{transform:translate(-50%,-50%) scale(0.97) translateY(3px) rotate(0.3deg)}
   100%{transform:translate(-50%,-50%) scale(1) translateY(0) rotate(0deg)}
 }
 
-/* Light source orbits slowly around the sphere — creates 3D rotation illusion */
+/* Light source orbits around the sphere — creates 3D rotation illusion */
 @keyframes orbLightRotate{
-  0%{transform:rotate(0deg) translate(8%,-8%)}
-  25%{transform:rotate(50deg) translate(14%,4%)}
-  50%{transform:rotate(20deg) translate(-6%,10%)}
-  75%{transform:rotate(-30deg) translate(4%,-12%)}
-  100%{transform:rotate(0deg) translate(8%,-8%)}
+  0%{transform:rotate(0deg) translate(10%,-10%)}
+  20%{transform:rotate(60deg) translate(16%,6%)}
+  40%{transform:rotate(25deg) translate(-8%,14%)}
+  60%{transform:rotate(-20deg) translate(-12%,-4%)}
+  80%{transform:rotate(-40deg) translate(6%,-16%)}
+  100%{transform:rotate(0deg) translate(10%,-10%)}
 }
 
 /* Internal shimmer shifts — liquid light moving inside */
 @keyframes orbCaustics{
-  0%{opacity:0.5;transform:rotate(0deg) scale(1)}
-  33%{opacity:1;transform:rotate(8deg) scale(1.06)}
-  66%{opacity:0.4;transform:rotate(-5deg) scale(0.94)}
-  100%{opacity:0.8;transform:rotate(3deg) scale(1.02)}
+  0%{opacity:0.4;transform:rotate(0deg) scale(1)}
+  20%{opacity:1;transform:rotate(10deg) scale(1.08)}
+  45%{opacity:0.3;transform:rotate(-8deg) scale(0.92)}
+  70%{opacity:0.9;transform:rotate(5deg) scale(1.05)}
+  100%{opacity:0.6;transform:rotate(-3deg) scale(0.97)}
 }
 
-@keyframes glowPulse{0%{opacity:0.4;transform:translate(-50%,-50%) scale(1)}100%{opacity:0.7;transform:translate(-50%,-50%) scale(1.1)}}
-@keyframes haloBreath{0%{opacity:0.3;transform:translate(-50%,-50%) scale(0.95)}100%{opacity:0.6;transform:translate(-50%,-50%) scale(1.08)}}
+@keyframes glowPulse{0%{opacity:0.35;transform:translate(-50%,-50%) scale(0.95)}100%{opacity:0.8;transform:translate(-50%,-50%) scale(1.15)}}
+@keyframes haloBreath{0%{opacity:0.25;transform:translate(-50%,-50%) scale(0.92)}100%{opacity:0.65;transform:translate(-50%,-50%) scale(1.12)}}
 /* ringDrift removed */
 
 /* === Orb mood states — each has unique life rhythm === */
