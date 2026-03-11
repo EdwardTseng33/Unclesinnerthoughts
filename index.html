@@ -55,7 +55,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1)}
 .orb-anchor .orb-space{pointer-events:auto}
 
-/* ===== ORB ===== */
+/* ===== ORB — Living Entity System ===== */
 .orb-space{position:relative;width:220px;height:220px;flex-shrink:0}
 .orb-core{position:absolute;top:50%;left:50%;width:160px;height:160px;
   transform:translate(-50%,-50%);border-radius:50%;
@@ -68,12 +68,44 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
     0 0 120px hsla(var(--orb-h),60%,50%,0.15),
     inset 0 0 50px rgba(255,255,255,0.12);
   animation:orbBreathe 5s ease-in-out infinite;
-  transition:all 2s cubic-bezier(0.4,0,0.2,1)}
+  transition:background 2s cubic-bezier(0.4,0,0.2,1), box-shadow 2s cubic-bezier(0.4,0,0.2,1);
+  overflow:hidden}
+
+/* Rotating light source — gives the orb a living, 3D quality */
+.orb-core::before{content:'';position:absolute;top:-20%;left:-20%;width:140%;height:140%;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,
+    rgba(255,255,255,0.25) 0%,
+    rgba(255,255,255,0.08) 25%,
+    transparent 55%);
+  animation:orbLightRotate 12s ease-in-out infinite;
+  pointer-events:none}
+
+/* Internal caustics / shimmer layer */
+.orb-core::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at 65% 70%, rgba(255,255,255,0.06) 0%, transparent 40%),
+    radial-gradient(ellipse at 25% 55%, rgba(255,255,255,0.04) 0%, transparent 35%);
+  animation:orbCaustics 8s ease-in-out infinite alternate;
+  mix-blend-mode:overlay;pointer-events:none}
+
 .orb-glow{position:absolute;top:50%;left:50%;width:200px;height:200px;
   transform:translate(-50%,-50%);border-radius:50%;
   background:radial-gradient(circle,hsla(var(--orb-h),70%,65%,0.15) 0%,transparent 70%);
   animation:glowPulse 4s ease-in-out infinite alternate;
   transition:all 2s}
+
+/* Ambient halo — soft outer atmosphere that breathes independently */
+.orb-halo{position:absolute;top:50%;left:50%;width:240px;height:240px;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,
+    hsla(var(--orb-h),60%,60%,0.06) 0%,
+    hsla(var(--orb-h),50%,50%,0.03) 40%,
+    transparent 70%);
+  animation:haloBreath 7s ease-in-out infinite alternate;
+  transition:all 2.5s;pointer-events:none}
+
 .orb-ring1{position:absolute;top:50%;left:50%;width:190px;height:190px;
   transform:translate(-50%,-50%);border-radius:50%;
   border:1px solid hsla(var(--orb-h),60%,70%,0.12);
@@ -83,21 +115,77 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   border:1px solid hsla(var(--orb-h),40%,60%,0.06);
   animation:ringDrift 15s linear infinite reverse}
 
+/* === Core keyframes === */
 @keyframes orbBreathe{
-  0%,100%{transform:translate(-50%,-50%) scale(1) translateY(0)}
-  30%{transform:translate(-50%,-50%) scale(1.03) translateY(-6px)}
-  60%{transform:translate(-50%,-50%) scale(0.98) translateY(2px)}
+  0%{transform:translate(-50%,-50%) scale(1) translateY(0) rotate(0deg)}
+  15%{transform:translate(-50%,-50%) scale(1.02) translateY(-4px) rotate(0.5deg)}
+  30%{transform:translate(-50%,-50%) scale(1.035) translateY(-6px) rotate(0deg)}
+  50%{transform:translate(-50%,-50%) scale(1.01) translateY(-2px) rotate(-0.3deg)}
+  70%{transform:translate(-50%,-50%) scale(0.98) translateY(2px) rotate(0.2deg)}
+  85%{transform:translate(-50%,-50%) scale(0.99) translateY(1px) rotate(-0.1deg)}
+  100%{transform:translate(-50%,-50%) scale(1) translateY(0) rotate(0deg)}
 }
+
+/* Light source orbits slowly around the sphere — creates 3D rotation illusion */
+@keyframes orbLightRotate{
+  0%{transform:rotate(0deg) translate(5%,-5%)}
+  25%{transform:rotate(35deg) translate(8%,2%)}
+  50%{transform:rotate(15deg) translate(-3%,6%)}
+  75%{transform:rotate(-20deg) translate(2%,-8%)}
+  100%{transform:rotate(0deg) translate(5%,-5%)}
+}
+
+/* Internal shimmer shifts — liquid light moving inside */
+@keyframes orbCaustics{
+  0%{opacity:0.6;transform:rotate(0deg) scale(1)}
+  33%{opacity:0.8;transform:rotate(5deg) scale(1.03)}
+  66%{opacity:0.5;transform:rotate(-3deg) scale(0.97)}
+  100%{opacity:0.7;transform:rotate(2deg) scale(1.01)}
+}
+
 @keyframes glowPulse{0%{opacity:0.6;transform:translate(-50%,-50%) scale(1)}100%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
+@keyframes haloBreath{0%{opacity:0.5;transform:translate(-50%,-50%) scale(1)}100%{opacity:0.9;transform:translate(-50%,-50%) scale(1.08)}}
 @keyframes ringDrift{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
 
-/* Orb mood states */
-.orb-core.listening{animation:orbBreathe 5s ease-in-out infinite, orbListenGlow 2s ease-in-out infinite alternate}
-.orb-core.thinking{animation:orbThink 2s ease-in-out infinite}
-.orb-core.empathy{animation:orbBreathe 6s ease-in-out infinite}
-.orb-core.warmth{animation:orbBreathe 5s ease-in-out infinite}
-@keyframes orbListenGlow{0%{box-shadow:0 0 60px hsla(var(--orb-h),80%,65%,0.35),0 0 120px hsla(var(--orb-h),60%,50%,0.15),inset 0 0 50px rgba(255,255,255,0.12)}100%{box-shadow:0 0 80px hsla(var(--orb-h),80%,65%,0.5),0 0 150px hsla(var(--orb-h),60%,50%,0.2),inset 0 0 50px rgba(255,255,255,0.15)}}
-@keyframes orbThink{0%,100%{transform:translate(-50%,-50%) scale(1)}25%{transform:translate(-50%,-50%) scale(0.96)}75%{transform:translate(-50%,-50%) scale(1.04)}}
+/* === Orb mood states — each has unique life rhythm === */
+.orb-core.listening{animation:orbListen 4s ease-in-out infinite}
+.orb-core.thinking{animation:orbThink 2.5s ease-in-out infinite}
+.orb-core.empathy{animation:orbEmpathy 6s ease-in-out infinite}
+.orb-core.warmth{animation:orbWarmth 5s ease-in-out infinite}
+.orb-core.alert{animation:orbAlert 1.5s ease-in-out infinite}
+
+@keyframes orbListen{
+  0%{transform:translate(-50%,-50%) scale(1) rotate(0deg);
+    box-shadow:0 0 60px hsla(var(--orb-h),80%,65%,0.35),0 0 120px hsla(var(--orb-h),60%,50%,0.15),inset 0 0 50px rgba(255,255,255,0.12)}
+  50%{transform:translate(-50%,-50%) scale(1.025) rotate(0.3deg);
+    box-shadow:0 0 80px hsla(var(--orb-h),80%,65%,0.5),0 0 150px hsla(var(--orb-h),60%,50%,0.22),inset 0 0 55px rgba(255,255,255,0.16)}
+  100%{transform:translate(-50%,-50%) scale(1) rotate(0deg);
+    box-shadow:0 0 60px hsla(var(--orb-h),80%,65%,0.35),0 0 120px hsla(var(--orb-h),60%,50%,0.15),inset 0 0 50px rgba(255,255,255,0.12)}
+}
+@keyframes orbThink{
+  0%,100%{transform:translate(-50%,-50%) scale(1) rotate(0deg)}
+  20%{transform:translate(-50%,-50%) scale(0.96) rotate(-0.5deg)}
+  50%{transform:translate(-50%,-50%) scale(1.02) rotate(0.3deg)}
+  80%{transform:translate(-50%,-50%) scale(1.04) rotate(-0.2deg)}
+}
+@keyframes orbEmpathy{
+  0%{transform:translate(-50%,-50%) scale(1) translateY(0) rotate(0deg)}
+  20%{transform:translate(-50%,-50%) scale(1.02) translateY(-3px) rotate(0.3deg)}
+  40%{transform:translate(-50%,-50%) scale(1.04) translateY(-5px) rotate(0deg)}
+  60%{transform:translate(-50%,-50%) scale(1.02) translateY(-3px) rotate(-0.2deg)}
+  80%{transform:translate(-50%,-50%) scale(0.99) translateY(1px) rotate(0.1deg)}
+  100%{transform:translate(-50%,-50%) scale(1) translateY(0) rotate(0deg)}
+}
+@keyframes orbWarmth{
+  0%{transform:translate(-50%,-50%) scale(1) rotate(0deg);filter:brightness(1)}
+  30%{transform:translate(-50%,-50%) scale(1.03) rotate(0.4deg);filter:brightness(1.05)}
+  60%{transform:translate(-50%,-50%) scale(0.98) rotate(-0.2deg);filter:brightness(0.98)}
+  100%{transform:translate(-50%,-50%) scale(1) rotate(0deg);filter:brightness(1)}
+}
+@keyframes orbAlert{
+  0%,100%{transform:translate(-50%,-50%) scale(1);filter:brightness(1)}
+  50%{transform:translate(-50%,-50%) scale(1.02);filter:brightness(1.08)}
+}
 
 /* ===== FLOATING TEXT ===== */
 .voice-area{position:absolute;width:100%;padding:0 2rem;text-align:center;
@@ -323,6 +411,85 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   animation:fbGlow 2s ease-in-out infinite alternate}
 @keyframes fbGlow{0%{opacity:0.5}100%{opacity:1}}
 
+/* ===== MOBILE RESPONSIVE ===== */
+@media(max-width:430px){
+  /* Smaller orb on mobile */
+  .orb-anchor{top:6vh}
+  .orb-space{width:170px;height:170px}
+  .orb-core{width:125px;height:125px}
+  .orb-glow{width:155px;height:155px}
+  .orb-halo{width:190px;height:190px}
+  .orb-ring1{width:148px;height:148px}
+  .orb-ring2{width:168px;height:168px}
+  /* Adjust scene padding to match smaller orb */
+  .scene{padding-top:calc(6vh + 170px)}
+  /* Tighter voice text */
+  .voice-text{font-size:0.98rem;line-height:1.85;max-width:300px}
+  .voice-area{padding:0 1.5rem}
+  /* Compact choice pills */
+  .choice-pill{padding:0.72rem 1.2rem;font-size:0.88rem;border-radius:20px}
+  .choices-ring{gap:8px;padding:0 1.2rem}
+  /* Companion scene tighter spacing */
+  #companion{padding-bottom:4.5rem}
+  .companion-choices{margin-top:0.6rem}
+  /* Splash adjustments */
+  #splash .splash-title{font-size:1.7rem}
+  #splash .splash-sub{font-size:0.9rem;line-height:1.8;max-width:270px}
+  #splash .splash-tagline{gap:1.4rem;margin-top:1.6rem;margin-bottom:2rem}
+  #splash .tag-icon{width:40px;height:40px;font-size:16px}
+  #splash .enter-btn{padding:0.9rem 2.8rem;font-size:0.98rem}
+  /* Context scene tighter */
+  .ctx-question{font-size:1.12rem;margin-bottom:1.2rem}
+  .ctx-options{gap:6px}
+  .ctx-opt{padding:0.8rem 1.1rem;font-size:0.88rem}
+  /* Whisper input */
+  .whisper-input{padding:0.8rem 1.2rem 1.5rem}
+  .whisper-field{padding:0.75rem 1.1rem;font-size:0.88rem}
+  /* Mood overlay */
+  .mood-q{font-size:0.95rem;margin-bottom:1.6rem;max-width:240px}
+  .mood-emoji{width:54px;height:64px;font-size:22px;border-radius:14px}
+  .mood-emojis{gap:9px}
+  /* Session end */
+  .session-end{gap:0.8rem;padding:1.5rem}
+  .session-end h3{font-size:1.05rem}
+  .session-end p{font-size:0.8rem;max-width:260px}
+  /* Breathe overlay */
+  .breathe-orb{width:110px;height:110px;font-size:0.85rem}
+}
+
+/* Extra small screens (iPhone SE, etc.) */
+@media(max-width:375px){
+  .orb-anchor{top:4vh}
+  .orb-space{width:150px;height:150px}
+  .orb-core{width:110px;height:110px}
+  .orb-glow{width:140px;height:140px}
+  .orb-halo{width:170px;height:170px}
+  .orb-ring1{width:132px;height:132px}
+  .orb-ring2{width:148px;height:148px}
+  .scene{padding-top:calc(4vh + 150px)}
+  .voice-text{font-size:0.92rem;line-height:1.8}
+  #splash .splash-title{font-size:1.5rem}
+  #splash .splash-sub{font-size:0.85rem;max-width:250px}
+  .ctx-question{font-size:1.05rem}
+}
+
+/* Short screens (landscape or very short phones) */
+@media(max-height:700px){
+  .orb-anchor{top:3vh}
+  .orb-space{width:140px;height:140px}
+  .orb-core{width:105px;height:105px}
+  .orb-glow{width:130px;height:130px}
+  .orb-halo{width:160px;height:160px}
+  .orb-ring1{width:125px;height:125px}
+  .orb-ring2{width:138px;height:138px}
+  .scene{padding-top:calc(3vh + 140px)}
+  .voice-text{font-size:0.9rem;line-height:1.75}
+  .choice-pill{padding:0.6rem 1rem;font-size:0.85rem}
+  .choices-ring{gap:6px}
+  #splash .splash-tagline{margin-top:1rem;margin-bottom:1.5rem}
+  #splash .enter-btn{padding:0.8rem 2.5rem}
+}
+
 /* ===== DISCLAIMER ===== */
 .disclaimer{position:absolute;bottom:8px;left:0;width:100%;text-align:center;
   font-size:0.65rem;color:var(--text-ghost);opacity:0.5;z-index:5;pointer-events:none}
@@ -481,6 +648,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
       <div class="orb-glow" id="compGlow"></div>
       <div class="orb-ring1"></div>
       <div class="orb-ring2"></div>
+      <div class="orb-halo"></div>
       <div class="orb-core" id="compCore"></div>
       <div class="status-whisper" id="orbStatus"></div>
     </div>
