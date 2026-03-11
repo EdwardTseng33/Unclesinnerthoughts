@@ -51,9 +51,8 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 /* ===== PERSISTENT ORB ANCHOR (fixed position across all scenes) ===== */
 .orb-anchor{
   position:absolute;top:12vh;left:50%;transform:translateX(-50%);
-  z-index:3;pointer-events:none;
-  transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1);
-  clip-path:inset(-150px -150px -45px -150px)}
+  z-index:1;pointer-events:none;
+  transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1)}
 .orb-anchor .orb-space{pointer-events:auto}
 
 /* ===== ORB — Living Entity System ===== */
@@ -1443,17 +1442,122 @@ function getClosingSuggestText(){
   return suggests[c] || '今天回去早點睡。認真的。有些問題睡一覺之後會長得不太一樣。';
 }
 
-// Takeaway quotes based on journey
+// Takeaway quotes — mood-aware × topic × randomized pool
 function getTakeawayText(){
   const c = userCtx.concern;
-  const takeaways = {
-    ai: '你不需要跑得比 AI 快，你只需要做 AI 做不到的事——帶著恐懼往前走。',
-    career: '方向不是想出來的，是走出來的。但前提是你先停下來看看路。',
-    burnout: '承認自己累了，不是示弱。是你終於對自己誠實了。',
-    meaning: '空虛是你心裡的指南針在轉——它在找方向，不是壞掉了。',
-    chat: '能把心裡的話說出來的大叔，比悶著的那個強。'
+  const score = userMoodScore;
+  let tier;
+  if(score <= 3) tier = 'low';
+  else if(score <= 6) tier = 'mid';
+  else tier = 'high';
+
+  const pool = {
+    ai: {
+      low: [
+        '今天光是面對「被取代」這個念頭，就已經比大多數人勇敢了。',
+        'AI 不會焦慮、不會失眠——但也不會在低潮的時候還硬撐著上班。你會，這就是你的價值。',
+        '累的時候不用想 AI 的事。先顧好自己，機器不會替你活。'
+      ],
+      mid: [
+        '你不需要跑得比 AI 快，你只需要做 AI 做不到的事——帶著恐懼往前走。',
+        'AI 會取代任務，但取代不了一個願意在深夜反省自己的人。',
+        '焦慮代表你還在乎。不在乎的人早就開啟自動駕駛了。'
+      ],
+      high: [
+        '今天狀態不錯——帶著這個能量，明天試著用 AI 搞定一件小事。掌控感是最好的解藥。',
+        '能笑著面對 AI 焦慮的大叔，已經比那些嘴上說不怕的人強了。',
+        '你的經驗 + AI 的效率 = 年輕人追不上的組合技。記住這個公式。'
+      ]
+    },
+    career: {
+      low: [
+        '卡住不丟臉。丟臉的是那些卡住了還假裝在衝的人。你至少是清醒的。',
+        '今天不用想出路。光是承認「我卡住了」，就已經比昨天進步了。',
+        '方向找不到的時候，先原地休息。迷路的人最怕的不是走錯，是走到沒力。'
+      ],
+      mid: [
+        '方向不是想出來的，是走出來的。但前提是你先停下來看看路。',
+        '你不是沒有方向，你是選項太多但電量太低。先充電，再選路。',
+        '職涯不是直線，是你回頭看才發現原來歪歪扭扭也到了。'
+      ],
+      high: [
+        '今天精神不錯——找個你覺得活得不錯的人，約他喝杯咖啡。出路常常是聊出來的。',
+        '卡住只是暫時的。你看過哪個大叔是一路順風走到今天的？沒有，都是撞牆撞出來的。',
+        '你已經撐過很多「以為撐不過去」的時刻了。這次也不例外。'
+      ]
+    },
+    burnout: {
+      low: [
+        '承認自己累了，不是示弱。是你終於對自己誠實了。',
+        '今天你能走到這裡，代表你還沒放棄自己。這就夠了。',
+        '累的時候什麼都不用做。你已經夠努力了，今天的功課是放過自己。'
+      ],
+      mid: [
+        '你的疲倦不是懶，是你的身體在提醒你：老闆不付加班費，但你的健康會。',
+        '「再撐一下」是大叔的口頭禪——但撐久了會內傷。偶爾放手不是放棄，是保養。',
+        '你不是機器人，不用每天滿格運轉。電量 30% 也可以出門，但記得找地方充電。'
+      ],
+      high: [
+        '今天狀態不錯。趁現在記住這個感覺——下次低潮的時候，你會知道好日子還是會來。',
+        '能累了還笑得出來的大叔，抗壓能力其實屌打一堆人。你只是忘了給自己鼓掌。',
+        '好好享受今天的輕鬆。你值得這種感覺，不只是偶爾。'
+      ]
+    },
+    meaning: {
+      low: [
+        '空虛是你心裡的指南針在轉——它在找方向，不是壞掉了。',
+        '覺得沒意義的時候，不用硬找意義。有時候活著本身就是意義，只是聽起來不夠勵志。',
+        '今天很沉。沒關係。連太陽都有下山的時候，你不用 24 小時都在發光。'
+      ],
+      mid: [
+        '你在想「活著的意義」——光是想這個問題，就代表你比大多數行屍走肉的人清醒。',
+        '意義不是一個答案，是一種累積。今天來這裡聊，就是累積的一部分。',
+        '不快樂不代表你有問題。代表你的標準比「活著就好」高。這是優點，不是毛病。'
+      ],
+      high: [
+        '今天心情不錯——記住這個瞬間。下次覺得空虛的時候翻出來看看，提醒自己好日子長這樣。',
+        '能在迷惘中還保持清醒的大叔，遲早會找到自己的路。因為你沒停下來。',
+        '你不需要想通人生。你只需要明天起床的時候，有一件事讓你覺得「還不錯」。'
+      ]
+    },
+    chat: {
+      low: [
+        '能把心裡的話說出來的大叔，比悶著的那個強。今天你做到了。',
+        '靠北完心裡有沒有鬆一點？有的話就對了。垃圾話也是一種情緒出口。',
+        '今天很悶。但至少你沒有把悶吞回去——光這一步很多人都做不到。'
+      ],
+      mid: [
+        '大叔的煩惱不一定需要答案，有時候只需要一個不會已讀的地方。你找到了。',
+        '靠北是一種能力。認真的。能把不爽說出來的人，比把一切往肚子裡吞的人健康得多。',
+        '生活就是這樣，有些鳥事解決不了，但講出來至少不會發霉。'
+      ],
+      high: [
+        '今天來坐坐就對了。大叔偶爾也需要一個不用裝的角落。',
+        '你的狀態不錯欸。帶著這個能量去做一件你一直拖著的事——趁現在有電。',
+        '聊完感覺怎樣？如果有輕鬆一點，那這趟就值了。下次悶了再來。'
+      ]
+    },
+    general: {
+      low: [
+        '你比你以為的更強。只是你習慣了不給自己打分。',
+        '今天能走到這裡，就代表你還在路上。這就夠了。',
+        '累的時候不用當英雄。連超人都有脫掉斗篷的時候。'
+      ],
+      mid: [
+        '大叔不需要答案，需要的是有人願意聽他講完。今天你做到了。',
+        '人生沒有標準答案。如果有，早就被寫成 SOP 然後外包了。',
+        '你不用什麼都想通。能承認「我不知道」的人，比裝懂的人清醒一百倍。'
+      ],
+      high: [
+        '今天狀態不錯——這種好日子要好好收藏。下次低潮的時候拿出來看。',
+        '能笑著靠北人生的大叔，基本上就是打不死的。你是那種人。',
+        '帶著今天的心情去過明天。你值得更多這樣的日子。'
+      ]
+    }
   };
-  return takeaways[c] || '你比你以為的更強。只是你習慣了不給自己打分。';
+
+  const list = pool[c]?.[tier] || pool.general[tier];
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 function buildConversationTree(){
@@ -2279,7 +2383,10 @@ function hideTyping(){
 function showMoodCheck(){
   document.getElementById('moodOverlay').classList.add('visible');
 }
+let userMoodScore = 5; // 1-10, default mid
 function selectMood(mood){
+  const moodScores = { heavy:2, meh:4, ok:5, lighter:7, good:9, skip:5 };
+  userMoodScore = moodScores[mood] || 5;
   document.getElementById('moodOverlay').classList.remove('visible');
   // After mood check, show replies for current node
   setTimeout(() => showReplies(), 600);
