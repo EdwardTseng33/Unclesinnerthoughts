@@ -639,8 +639,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   letter-spacing:0.02em;font-style:italic}
 
 /* ===== EMOTIONAL ECHO (subtle affirmation below voice text) ===== */
-.emotional-echo{display:none}
-/* emotional-echo removed */
+/* emotional-echo fully removed */
 
 /* ===== SESSION TIMER (subtle, top-right) ===== */
 .session-timer{position:absolute;top:1.2rem;right:1.2rem;z-index:6;
@@ -750,7 +749,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
     <div class="companion-voice" id="voiceZone">
       <div class="typing-dots" id="typingDots"><span></span><span></span><span></span></div>
       <div class="voice-text" id="voiceText"></div>
-      <div class="emotional-echo" id="emotionalEcho"></div>
+      <!-- emotional-echo removed -->
     </div>
     <div class="companion-choices">
       <div class="choices-ring" id="choicesRing"></div>
@@ -1398,23 +1397,8 @@ function getSessionMinutes(){
   return Math.floor((Date.now() - sessionStartTime) / 60000);
 }
 
-// Emotional echo — subtle affirmation below voice text
-const echoMessages = {
-  empathy: ['我在', '聽到了', '不急', '你可以的'],
-  warmth: ['在這裡', '陪你', '嗯', '我懂'],
-  listening: ['...', '聽著', '嗯'],
-  thinking: ['想一下', '嗯...'],
-  alert: ['很重要', '認真的']
-};
-function showEmotionalEcho(mood){
-  const el = document.getElementById('emotionalEcho');
-  const msgs = echoMessages[mood] || echoMessages.listening;
-  const msg = msgs[Math.floor(Math.random() * msgs.length)];
-  el.textContent = '— ' + msg;
-  el.classList.remove('visible');
-  setTimeout(() => el.classList.add('visible'), 1500);
-  setTimeout(() => el.classList.remove('visible'), 6000);
-}
+// Emotional echo — REMOVED (was overlapping with voice text)
+function showEmotionalEcho(mood){ return; }
 
 // Depth indicator — shows conversation depth as dots
 function updateDepthIndicator(){
@@ -2638,7 +2622,7 @@ function restartSession(){
   document.getElementById('journeyLabel').textContent = '';
   document.getElementById('takeawayCard').classList.remove('visible');
   document.querySelectorAll('.fb-btn').forEach(b => b.classList.remove('selected'));
-  document.getElementById('emotionalEcho').classList.remove('visible');
+  // emotionalEcho removed
   document.getElementById('depthIndicator').innerHTML = '';
   document.getElementById('depthIndicator').classList.remove('visible');
   stopSessionTimer();
