@@ -4,6 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>大叔心聲</title>
+<meta name="description" content="不用掛號、不用預約、不用假裝沒事。給 30-50 歲台灣大叔的深夜樹洞。">
+<meta name="theme-color" content="#0a0b10">
+
+<!-- Open Graph / LINE / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://unclesinnerthoughts.vercel.app/">
+<meta property="og:title" content="大叔心聲——不用掛號的深夜樹洞">
+<meta property="og:description" content="給 30-50 歲台灣男性的情緒陪伴。不用預約、不用假裝沒事、不會出現在帳單上。">
+<meta property="og:image" content="https://unclesinnerthoughts.vercel.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:site_name" content="大叔心聲">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="大叔心聲——不用掛號的深夜樹洞">
+<meta name="twitter:description" content="給 30-50 歲台灣男性的情緒陪伴。不用預約、不用假裝沒事。">
+<meta name="twitter:image" content="https://unclesinnerthoughts.vercel.app/og-image.png">
+
+<!-- Favicon (inline SVG orb) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='40%25' cy='35%25'%3E%3Cstop offset='0%25' stop-color='%23b8c4ff' stop-opacity='0.95'/%3E%3Cstop offset='60%25' stop-color='%236875d0' stop-opacity='0.7'/%3E%3Cstop offset='100%25' stop-color='%233a4491' stop-opacity='0.4'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='12' cy='11' r='4' fill='white' opacity='0.3'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%230a0b10'/%3E%3Cdefs%3E%3CradialGradient id='g' cx='40%25' cy='35%25'%3E%3Cstop offset='0%25' stop-color='%23b8c4ff' stop-opacity='0.95'/%3E%3Cstop offset='60%25' stop-color='%236875d0' stop-opacity='0.7'/%3E%3Cstop offset='100%25' stop-color='%233a4491' stop-opacity='0.4'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='90' cy='90' r='65' fill='url(%23g)'/%3E%3Ccircle cx='72' cy='70' r='18' fill='white' opacity='0.25'/%3E%3C/svg%3E">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
@@ -815,10 +838,10 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   </div>
 
   <div class="safety-banner" id="safetyBanner">
-    <strong>你不是一個人。</strong><br>
-    如果你正在經歷很大的痛苦，請撥打<br>
-    <a href="tel:1925">1925 安心專線</a>（24 小時免費）<br>
-    或 <a href="tel:1980">1980 張老師專線</a><br>
+    <strong>兄弟，這通電話值得打。</strong><br>
+    <a href="tel:1925">1925 安心專線</a>（24H 免費，不會留紀錄）<br>
+    <a href="tel:1980">1980 張老師專線</a>（也是 24H）<br>
+    他們聽過比你更慘的故事，不會大驚小怪。<br>
     <button class="safety-dismiss" onclick="closeSafety()">我知道了</button>
   </div>
 
@@ -2230,14 +2253,14 @@ function buildConversationTree(){
 
     // === SAFETY ===
     safety_trigger: {
-      text: '謝謝你願意說這個。我是 AI，能做的有限——但有人可以幫你，他們比我專業得多。',
+      text: '我聽到了。這件事不是靠北就能解決的——有人能真的幫你，不是我在客氣。下面這些人，半夜三點也接電話，而且不會出現在你的帳單上。',
       mood: 'alert',
-      status: '重要',
+      status: '認真的',
       delay: 1500,
       after: 'show_safety',
       replies: [
         {text: '我知道了', next: 'burn_rest'},
-        {text: '謝謝', next: 'burn_rest'}
+        {text: '謝了', next: 'burn_rest'}
       ]
     },
 
@@ -2263,7 +2286,11 @@ function buildConversationTree(){
       ]
     },
     closing_final: {
-      text: '大叔們不用互相加油——加油這種話留給啦啦隊就好。我們只需要知道：有人懂就好了。下次悶了再來，這裡全年無休，而且不收掛號費。',
+      textPool: [
+        '大叔們不用互相加油——加油這種話留給啦啦隊就好。我們只需要知道：有人懂就好了。下次悶了再來，這裡全年無休，而且不收掛號費。',
+        '好了，今天到這。我不會說「一切都會好起來」這種幹話——但我相信一件事：願意走進來的人，不會走不出去。掰。',
+        '走吧，別讓老婆等太久。這裡又不會消失——下次心裡裝不下的時候，回來倒就好。不用敲門，門沒鎖。'
+      ],
       mood: 'warmth',
       status: '掰了兄弟',
       delay: 2500,
@@ -2408,8 +2435,7 @@ function hideChoices(){
 
 // ===== WHISPER INPUT =====
 function showWhisperInput(){
-  // Disabled — free text input removed (no AI backend to analyze)
-  return;
+  document.getElementById('whisperInput').classList.add('visible');
 }
 function hideWhisperInput(){
   document.getElementById('whisperInput').classList.remove('visible');
@@ -2450,7 +2476,7 @@ document.getElementById('whisperField').addEventListener('keydown', e => {
 function processFreeText(text){
   const t = text.toLowerCase();
   // Safety check first — stricter patterns to avoid false positives (笑死、死線)
-  if(/自殺|不想活|想死[^線]|去死|結束生命|跳樓|跳下去|活不下去|不在了/.test(t)) return 'safety_trigger';
+  if(/自殺|不想活|想死(?!線)|去死|結束生命|跳樓|跳下去|活不下去|不在了/.test(t)) return 'safety_trigger';
   if(/ai|自動化|機器|取代|chatgpt/.test(t)) return 'ai_replace';
   if(/累|疲|撐|受不了|爆|崩/.test(t)) return 'tired_core';
   if(/不知道|迷|惘|方向|茫/.test(t)) return 'mean_empty';
@@ -2683,8 +2709,17 @@ function restartSession(){
   fadeVoice();
   hideChoices();
   resetColorJourney();
-  showScene('splash');
   setMood('neutral');
+  // Returning users skip splash, go directly to topic selection
+  if(currentUser && isReturningUser){
+    showScene('context');
+    // Jump to topic step (skip age + job if already known)
+    if(userCtx.job){
+      setTimeout(() => showStep('concern'), 300);
+    }
+  } else {
+    showScene('splash');
+  }
 }
 
 // ===== GOOGLE AUTH (GSI + localStorage persistence) =====
