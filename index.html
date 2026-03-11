@@ -300,10 +300,10 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   box-shadow:0 4px 16px hsla(var(--orb-h),40%,40%,0.08)}
 #splash .tag-label{font-size:0.68rem;color:var(--text-ghost);letter-spacing:0.08em;opacity:0.8}
 /* Shared button base for splash */
-#splash .splash-btn{width:100%;max-width:280px;padding:0.95rem 1.6rem;border-radius:16px;
+#splash .splash-btn{padding:0.9rem 2.8rem;border-radius:14px;
   font-size:0.95rem;font-weight:400;cursor:pointer;font-family:inherit;
   transition:all 0.4s cubic-bezier(0.4,0,0.2,1);letter-spacing:0.04em;
-  display:flex;align-items:center;justify-content:center;gap:10px;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
   backdrop-filter:blur(12px)}
 /* Primary CTA — 進來坐 / 繼續聊 */
 #splash .enter-btn{border:none;
@@ -317,10 +317,10 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   letter-spacing:0.02em;opacity:0.6}
 
 /* ===== GOOGLE LOGIN — same width as CTA ===== */
-.google-login-btn{margin-top:0.6rem;width:100%;max-width:280px;padding:0.8rem 1.2rem;border-radius:16px;
+.google-login-btn{margin-top:0.6rem;padding:0.75rem 1.8rem;border-radius:14px;
   background:hsla(0,0%,100%,0.04);border:1px solid hsla(0,0%,100%,0.08);
   color:var(--text-soft);font-size:0.8rem;font-family:inherit;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.3s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:all 0.3s;
   backdrop-filter:blur(12px);letter-spacing:0.02em;white-space:nowrap}
 .google-login-btn:hover{background:hsla(0,0%,100%,0.08);border-color:hsla(0,0%,100%,0.14);
   transform:translateY(-1px)}
@@ -678,19 +678,20 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 .typing-dots{display:none}
 
 /* ===== AUTH / AVATAR ===== */
-.user-avatar-bar{display:none;align-items:center;gap:10px;margin-bottom:0.8rem;
-  padding:0.45rem 0.9rem;border-radius:24px;background:hsla(var(--orb-h),12%,12%,0.4);
-  border:1px solid hsla(var(--orb-h),18%,24%,0.12);backdrop-filter:blur(10px)}
+.user-avatar-bar{display:none;align-items:center;gap:8px;
+  position:absolute;top:1.2rem;right:1.2rem;
+  padding:0.35rem 0.7rem 0.35rem 0.35rem;border-radius:20px;
+  background:hsla(var(--orb-h),10%,10%,0.35);
+  border:1px solid hsla(var(--orb-h),15%,20%,0.1);backdrop-filter:blur(8px);z-index:5}
 .user-avatar-bar.visible{display:flex}
-.user-avatar-bar img{width:28px;height:28px;border-radius:50%;border:1px solid hsla(var(--orb-h),30%,45%,0.2);
-  box-shadow:0 0 8px hsla(var(--orb-h),40%,50%,0.1)}
-.user-avatar-bar span{font-size:0.78rem;color:var(--text-soft);letter-spacing:0.02em}
-.welcome-back-msg{font-size:0.85rem;color:var(--text-soft);margin-bottom:0.4rem;opacity:0;
+.user-avatar-bar img{width:24px;height:24px;border-radius:50%;border:1px solid hsla(var(--orb-h),25%,40%,0.15)}
+.user-avatar-bar span{font-size:0.72rem;color:var(--text-ghost);letter-spacing:0.02em}
+.welcome-back-msg{font-size:0.88rem;color:var(--text-soft);margin-bottom:0.2rem;opacity:0;
   transition:opacity 1s ease;font-weight:300;letter-spacing:0.03em}
-.welcome-back-msg.visible{opacity:0.85}
-.logout-link{font-size:0.68rem;color:var(--text-ghost);cursor:pointer;margin-top:0.6rem;
-  text-decoration:none;letter-spacing:0.04em;opacity:0.5;transition:all 0.3s}
-.logout-link:hover{color:var(--text-soft);opacity:0.8}
+.welcome-back-msg.visible{opacity:0.8}
+.logout-link{font-size:0.65rem;color:var(--text-ghost);cursor:pointer;margin-top:0.4rem;
+  text-decoration:none;letter-spacing:0.04em;opacity:0.4;transition:all 0.3s}
+.logout-link:hover{color:var(--text-soft);opacity:0.7}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -2744,8 +2745,9 @@ function showReturningUI(){
 
   // Change button text
   document.getElementById('enterBtn').textContent = '繼續聊';
-  // Hide tagline for cleaner look
+  // Hide first-timer elements for cleaner returning user layout
   document.getElementById('splashSub').style.display = 'none';
+  document.getElementById('splashTagline').style.display = 'none';
 }
 
 function handleLogout(){
@@ -2765,6 +2767,7 @@ function handleLogout(){
   document.getElementById('logoutLink').style.display = 'none';
   document.getElementById('enterBtn').textContent = '進來坐';
   document.getElementById('splashSub').style.display = '';
+  document.getElementById('splashTagline').style.display = '';
   document.getElementById('privacyNote').innerHTML = '🔒 不留紀錄｜老婆不會知道';
 }
 
