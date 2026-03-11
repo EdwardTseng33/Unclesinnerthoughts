@@ -64,9 +64,9 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
     hsla(var(--orb-h),70%,55%,0.7),
     hsla(calc(var(--orb-h) - 40),50%,45%,0.4));
   box-shadow:
-    0 0 70px hsla(var(--orb-h),80%,65%,0.45),
-    0 0 140px hsla(var(--orb-h),60%,50%,0.2),
-    inset 0 0 55px rgba(255,255,255,0.15);
+    0 0 50px hsla(var(--orb-h),70%,60%,0.25),
+    0 0 100px hsla(var(--orb-h),50%,45%,0.10),
+    inset 0 0 40px rgba(255,255,255,0.10);
   animation:orbBreathe 5s ease-in-out infinite;
   transition:background 2s cubic-bezier(0.4,0,0.2,1), box-shadow 2s cubic-bezier(0.4,0,0.2,1);
   overflow:hidden}
@@ -92,7 +92,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 
 .orb-glow{position:absolute;top:50%;left:50%;width:200px;height:200px;
   transform:translate(-50%,-50%);border-radius:50%;
-  background:radial-gradient(circle,hsla(var(--orb-h),70%,65%,0.15) 0%,transparent 70%);
+  background:radial-gradient(circle,hsla(var(--orb-h),60%,60%,0.08) 0%,transparent 70%);
   animation:glowPulse 4s ease-in-out infinite alternate;
   transition:all 2s}
 
@@ -100,20 +100,13 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 .orb-halo{position:absolute;top:50%;left:50%;width:260px;height:260px;
   transform:translate(-50%,-50%);border-radius:50%;
   background:radial-gradient(circle,
-    hsla(var(--orb-h),65%,65%,0.22) 0%,
-    hsla(var(--orb-h),55%,55%,0.10) 40%,
+    hsla(var(--orb-h),55%,60%,0.10) 0%,
+    hsla(var(--orb-h),45%,50%,0.04) 40%,
     transparent 70%);
   animation:haloBreath 6s ease-in-out infinite alternate;
   transition:all 2.5s;pointer-events:none}
 
-.orb-ring1{position:absolute;top:50%;left:50%;width:190px;height:190px;
-  transform:translate(-50%,-50%);border-radius:50%;
-  border:1px solid hsla(var(--orb-h),60%,70%,0.18);
-  animation:ringDrift 10s linear infinite}
-.orb-ring2{position:absolute;top:50%;left:50%;width:215px;height:215px;
-  transform:translate(-50%,-50%);border-radius:50%;
-  border:1px solid hsla(var(--orb-h),40%,60%,0.10);
-  animation:ringDrift 15s linear infinite reverse}
+/* rings removed */
 
 /* === Core keyframes === */
 @keyframes orbBreathe{
@@ -143,9 +136,9 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   100%{opacity:0.8;transform:rotate(3deg) scale(1.02)}
 }
 
-@keyframes glowPulse{0%{opacity:0.6;transform:translate(-50%,-50%) scale(1)}100%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
-@keyframes haloBreath{0%{opacity:0.4;transform:translate(-50%,-50%) scale(0.95)}100%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
-@keyframes ringDrift{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes glowPulse{0%{opacity:0.4;transform:translate(-50%,-50%) scale(1)}100%{opacity:0.7;transform:translate(-50%,-50%) scale(1.1)}}
+@keyframes haloBreath{0%{opacity:0.3;transform:translate(-50%,-50%) scale(0.95)}100%{opacity:0.6;transform:translate(-50%,-50%) scale(1.08)}}
+/* ringDrift removed */
 
 /* === Orb mood states — each has unique life rhythm === */
 .orb-core.listening{animation:orbListen 4s ease-in-out infinite}
@@ -156,11 +149,11 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 
 @keyframes orbListen{
   0%{transform:translate(-50%,-50%) scale(1) rotate(0deg);
-    box-shadow:0 0 60px hsla(var(--orb-h),80%,65%,0.35),0 0 120px hsla(var(--orb-h),60%,50%,0.15),inset 0 0 50px rgba(255,255,255,0.12)}
+    box-shadow:0 0 40px hsla(var(--orb-h),70%,60%,0.2),0 0 80px hsla(var(--orb-h),50%,45%,0.08),inset 0 0 35px rgba(255,255,255,0.08)}
   50%{transform:translate(-50%,-50%) scale(1.025) rotate(0.3deg);
-    box-shadow:0 0 80px hsla(var(--orb-h),80%,65%,0.5),0 0 150px hsla(var(--orb-h),60%,50%,0.22),inset 0 0 55px rgba(255,255,255,0.16)}
+    box-shadow:0 0 55px hsla(var(--orb-h),70%,60%,0.3),0 0 100px hsla(var(--orb-h),50%,45%,0.12),inset 0 0 40px rgba(255,255,255,0.10)}
   100%{transform:translate(-50%,-50%) scale(1) rotate(0deg);
-    box-shadow:0 0 60px hsla(var(--orb-h),80%,65%,0.35),0 0 120px hsla(var(--orb-h),60%,50%,0.15),inset 0 0 50px rgba(255,255,255,0.12)}
+    box-shadow:0 0 40px hsla(var(--orb-h),70%,60%,0.2),0 0 80px hsla(var(--orb-h),50%,45%,0.08),inset 0 0 35px rgba(255,255,255,0.08)}
 }
 @keyframes orbThink{
   0%,100%{transform:translate(-50%,-50%) scale(1) rotate(0deg)}
@@ -219,9 +212,9 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 
 /* Ripple flash on touch */
 .orb-core.morph-flash{
-  box-shadow:0 0 80px hsla(var(--orb-h),85%,70%,0.55),
-    0 0 150px hsla(var(--orb-h),70%,55%,0.25),
-    inset 0 0 60px rgba(255,255,255,0.2) !important;
+  box-shadow:0 0 55px hsla(var(--orb-h),75%,65%,0.35),
+    0 0 100px hsla(var(--orb-h),60%,50%,0.12),
+    inset 0 0 40px rgba(255,255,255,0.12) !important;
   transition:box-shadow 0.15s ease-out !important}
 
 /* ===== FLOATING TEXT ===== */
@@ -491,8 +484,6 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   .orb-core{width:125px;height:125px}
   .orb-glow{width:155px;height:155px}
   .orb-halo{width:210px;height:210px}
-  .orb-ring1{width:148px;height:148px}
-  .orb-ring2{width:168px;height:168px}
   /* Adjust scene padding to match smaller orb */
   .scene{padding-top:calc(6vh + 240px)}
   /* Tighter voice text */
@@ -539,8 +530,6 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   .orb-core{width:110px;height:110px}
   .orb-glow{width:140px;height:140px}
   .orb-halo{width:185px;height:185px}
-  .orb-ring1{width:132px;height:132px}
-  .orb-ring2{width:148px;height:148px}
   .scene{padding-top:calc(4vh + 215px)}
   .voice-text{font-size:0.92rem;line-height:1.8}
   #splash .splash-title{font-size:1.5rem}
@@ -555,8 +544,6 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   .orb-core{width:105px;height:105px}
   .orb-glow{width:130px;height:130px}
   .orb-halo{width:175px;height:175px}
-  .orb-ring1{width:125px;height:125px}
-  .orb-ring2{width:138px;height:138px}
   .scene{padding-top:calc(3vh + 200px)}
   .voice-text{font-size:0.9rem;line-height:1.75}
   .choice-pill{padding:0.6rem 1rem;font-size:0.85rem}
@@ -741,8 +728,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   <div class="orb-anchor" id="orbAnchor">
     <div class="orb-space" id="compOrb">
       <div class="orb-glow" id="compGlow"></div>
-      <div class="orb-ring1"></div>
-      <div class="orb-ring2"></div>
+      <!-- rings removed -->
       <div class="orb-halo"></div>
       <div class="orb-core" id="compCore"></div>
       <div class="status-whisper" id="orbStatus"></div>
@@ -2737,8 +2723,9 @@ function onGoogleCredential(response){
   try{ localStorage.setItem('dashu_user', JSON.stringify(currentUser)); }catch(e){}
 
   // Check if returning user with saved profile
+  markNewVisit();
   const saved = loadUserProfile();
-  if(saved){
+  if(saved && saved.ctx && saved.ctx.concern){
     isReturningUser = true;
     userCtx = saved.ctx;
     showReturningUI();
@@ -2758,10 +2745,41 @@ function loadUserProfile(){
 function saveUserProfile(){
   if(!currentUser) return;
   try{
+    const existing = loadUserProfile() || {};
+    const visits = (existing.visitCount || 0) + (existing._visitCounted ? 0 : 1);
+    const history = existing.topicHistory || [];
+    // Append current topic if new session context exists
+    if(userCtx.concern && !existing._visitCounted){
+      history.push({
+        concern: userCtx.concern,
+        job: userCtx.job,
+        age: userCtx.age,
+        date: new Date().toISOString().slice(0,10)
+      });
+      // Keep last 20 entries
+      if(history.length > 20) history.splice(0, history.length - 20);
+    }
     localStorage.setItem('dashu_profile_' + currentUser.id, JSON.stringify({
       ctx: userCtx,
-      lastVisit: Date.now()
+      lastVisit: Date.now(),
+      firstVisit: existing.firstVisit || Date.now(),
+      visitCount: visits,
+      topicHistory: history,
+      _visitCounted: true
     }));
+  }catch(e){}
+}
+
+// Reset visit-counted flag on new page load so next session counts
+function markNewVisit(){
+  if(!currentUser) return;
+  try{
+    const existing = loadUserProfile();
+    if(existing){
+      existing._visitCounted = false;
+      existing.visitCount = (existing.visitCount || 0) + 1;
+      localStorage.setItem('dashu_profile_' + currentUser.id, JSON.stringify(existing));
+    }
   }catch(e){}
 }
 
@@ -2780,14 +2798,30 @@ function showLoggedInUI(){
 
 function showReturningUI(){
   showLoggedInUI();
-  // Welcome back message
+  const saved = loadUserProfile() || {};
+  const visits = saved.visitCount || 1;
+  // Welcome back message — adapts by visit count
   const firstName = currentUser.name.split(' ')[0] || '大叔';
-  const msgs = [
-    firstName + '，又來啦。',
-    '嘿 ' + firstName + '，想你了。',
-    firstName + '，歡迎回來坐坐。',
-    '喲，' + firstName + ' 今天也辛苦了。'
-  ];
+  let msgs;
+  if(visits <= 2){
+    msgs = [
+      firstName + '，又來啦。',
+      '嘿 ' + firstName + '，想你了。',
+      firstName + '，歡迎回來坐坐。'
+    ];
+  } else if(visits <= 5){
+    msgs = [
+      firstName + '，第 ' + visits + ' 次了欸，看來這裡還行。',
+      '喲，' + firstName + '。常客了你。',
+      firstName + '，老地方，坐吧。'
+    ];
+  } else {
+    msgs = [
+      firstName + '，來了 ' + visits + ' 次了——這裡快變你家了。',
+      '嘿 ' + firstName + '，你都比這光球還常出現了。',
+      firstName + '，第 ' + visits + ' 次。你是我最忠實的大叔。'
+    ];
+  }
   const wb = document.getElementById('welcomeBackMsg');
   wb.textContent = pick(msgs);
   setTimeout(() => wb.classList.add('visible'), 300);
@@ -2828,6 +2862,7 @@ function restoreSession(){
     const raw = localStorage.getItem('dashu_user');
     if(raw){
       currentUser = JSON.parse(raw);
+      markNewVisit(); // Count this as a new visit
       const saved = loadUserProfile();
       if(saved){
         isReturningUser = true;
