@@ -33,7 +33,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   transition:all 2.5s}
 .atmo-center{position:absolute;top:25%;left:50%;width:300px;height:300px;transform:translate(-50%,-15%);
   background:radial-gradient(circle,hsla(var(--orb-h),50%,30%,0.12) 0%,transparent 70%);
-  border-radius:50%;filter:blur(40px);transition:all 2.5s}
+  border-radius:50%;-webkit-clip-path:circle(50%);clip-path:circle(50%);filter:blur(40px);transition:all 2.5s}
 .atmo-bottom{position:absolute;bottom:0;left:0;width:100%;height:40%;
   background:linear-gradient(to top,hsla(var(--bg-h),30%,4%,0.9) 0%,transparent 100%)}
 
@@ -51,12 +51,12 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 /* ===== PERSISTENT ORB ANCHOR (fixed position across all scenes) ===== */
 .orb-anchor{
   position:absolute;top:12vh;left:50%;transform:translateX(-50%);
-  z-index:3;pointer-events:none;
+  z-index:3;pointer-events:none;overflow:visible;background:transparent;
   transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1)}
 .orb-anchor .orb-space{pointer-events:auto}
 
 /* ===== ORB — Living Entity System ===== */
-.orb-space{position:relative;width:220px;height:220px;flex-shrink:0}
+.orb-space{position:relative;width:220px;height:220px;flex-shrink:0;overflow:visible;background:transparent}
 .orb-core{position:absolute;top:50%;left:50%;width:160px;height:160px;
   transform:translate(-50%,-50%);border-radius:50%;
   background:radial-gradient(circle at 38% 32%,
@@ -69,7 +69,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
     inset 0 0 40px rgba(255,255,255,0.10);
   animation:orbBreathe 5s ease-in-out infinite;
   transition:background 2s cubic-bezier(0.4,0,0.2,1), box-shadow 2s cubic-bezier(0.4,0,0.2,1);
-  overflow:hidden}
+  -webkit-clip-path:circle(50%);clip-path:circle(50%);overflow:hidden}
 
 /* Rotating light source — gives the orb a living, 3D quality */
 .orb-core::before{content:'';position:absolute;top:-20%;left:-20%;width:140%;height:140%;
