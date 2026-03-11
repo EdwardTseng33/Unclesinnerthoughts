@@ -313,8 +313,8 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 #splash .tag-icon:hover{transform:translateY(-2px);border-color:hsla(var(--orb-h),35%,45%,0.25);
   box-shadow:0 4px 16px hsla(var(--orb-h),40%,40%,0.08)}
 #splash .tag-label{font-size:0.68rem;color:var(--text-ghost);letter-spacing:0.08em;opacity:0.8}
-/* Shared button base for splash — consistent sizing */
-#splash .splash-btn{padding:0.75rem 2.4rem;border-radius:12px;
+/* Shared button base for splash — fixed width for consistency */
+#splash .splash-btn{width:240px;padding:0.75rem 0;border-radius:12px;
   font-size:0.9rem;font-weight:400;cursor:pointer;font-family:inherit;
   transition:all 0.4s cubic-bezier(0.4,0,0.2,1);letter-spacing:0.04em;
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
@@ -331,7 +331,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   letter-spacing:0.02em;opacity:0.5}
 
 /* ===== GOOGLE LOGIN — same width as CTA ===== */
-.google-login-btn{margin-top:0.5rem;padding:0.65rem 2.0rem;border-radius:12px;
+.google-login-btn{margin-top:0.5rem;width:240px;padding:0.65rem 0;border-radius:12px;
   background:hsla(0,0%,100%,0.04);border:1px solid hsla(0,0%,100%,0.08);
   color:var(--text-soft);font-size:0.82rem;font-family:inherit;cursor:pointer;
   display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:all 0.3s;
@@ -509,7 +509,8 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   #splash .splash-sub{font-size:0.9rem;line-height:1.8;max-width:270px}
   #splash .splash-tagline{gap:1.4rem;margin-top:1.6rem;margin-bottom:2rem}
   #splash .tag-icon{width:40px;height:40px;font-size:16px}
-  #splash .enter-btn{padding:0.7rem 2.2rem;font-size:0.88rem}
+  #splash .enter-btn{width:220px;font-size:0.88rem}
+  .google-login-btn{width:220px}
   /* Context scene tighter */
   .ctx-question{font-size:1.12rem;margin-bottom:1.2rem}
   .ctx-options{gap:6px}
