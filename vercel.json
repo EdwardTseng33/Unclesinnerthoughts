@@ -1,12 +1,6 @@
 {
   "version": 2,
   "name": "dashu-voice",
-  "builds": [
-    { "src": "index.html", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -15,6 +9,15 @@
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
+    },
+    {
+      "source": "/audio/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     }
+  ],
+  "rewrites": [
+    { "source": "/((?!audio|sw\\.js|manifest\\.json|dashu-|og-).*)", "destination": "/index.html" }
   ]
 }
