@@ -602,6 +602,101 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   .scene{padding-top:calc(9svh + 145px)}
 }
 
+/* ===== BURN-IT OVERLAY (文字銷毀紓壓) ===== */
+.burn-overlay{
+  position:absolute;top:0;left:0;width:100%;height:100%;z-index:22;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1.2rem;padding:2rem;
+  background:rgba(6,7,12,0.95);backdrop-filter:blur(8px);
+  opacity:0;pointer-events:none;transition:opacity 0.6s}
+.burn-overlay.active{opacity:1;pointer-events:auto}
+.burn-title{font-size:0.92rem;color:var(--text-soft);font-weight:300;letter-spacing:0.02em;text-align:center;line-height:1.7}
+.burn-area{position:relative;width:100%;max-width:320px}
+.burn-field{
+  width:100%;min-height:100px;max-height:180px;padding:1rem 1.2rem;
+  background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;color:var(--text-main);font-family:inherit;font-size:0.95rem;
+  line-height:1.7;resize:none;outline:none;
+  transition:border-color 0.3s}
+.burn-field:focus{border-color:hsla(var(--orb-h),40%,50%,0.3)}
+.burn-field::placeholder{color:var(--text-ghost)}
+.burn-btn{
+  padding:0.7rem 2rem;border-radius:12px;border:none;
+  background:linear-gradient(135deg,hsla(15,80%,45%,0.8),hsla(5,70%,40%,0.8));
+  color:rgba(255,255,255,0.9);font-family:inherit;font-size:0.88rem;font-weight:400;
+  cursor:pointer;letter-spacing:0.04em;
+  transition:all 0.3s;opacity:0.4;pointer-events:none}
+.burn-btn.ready{opacity:1;pointer-events:auto}
+.burn-btn.ready:hover{transform:translateY(-2px);box-shadow:0 4px 20px hsla(10,70%,40%,0.3)}
+.burn-skip{
+  font-size:0.78rem;color:var(--text-ghost);background:none;border:none;
+  cursor:pointer;font-family:inherit;margin-top:0.3rem}
+/* Burn animation */
+.burn-area.burning .burn-field{
+  animation:burnText 1.8s cubic-bezier(0.4,0,0.2,1) forwards}
+@keyframes burnText{
+  0%{opacity:1;filter:brightness(1) blur(0);transform:scale(1)}
+  30%{filter:brightness(1.8) blur(0);color:#ff6633;border-color:hsla(15,80%,50%,0.5)}
+  60%{opacity:0.6;filter:brightness(2) blur(2px);transform:scale(0.98)}
+  100%{opacity:0;filter:brightness(3) blur(8px);transform:scale(0.9) translateY(-10px)}}
+.burn-particles{
+  position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.burn-particle{
+  position:absolute;width:4px;height:4px;border-radius:50%;
+  pointer-events:none;opacity:0}
+.burn-particle.active{
+  animation:particleRise 1.5s ease-out forwards}
+@keyframes particleRise{
+  0%{opacity:0.9;transform:translateY(0) scale(1)}
+  50%{opacity:0.6}
+  100%{opacity:0;transform:translateY(-80px) scale(0);}}
+.burn-done{
+  font-size:0.88rem;color:var(--text-soft);font-weight:300;text-align:center;
+  line-height:1.7;opacity:0;transition:opacity 0.8s;margin-top:0.5rem}
+.burn-done.visible{opacity:1}
+
+/* ===== AMBIENT SOUND CONTROL ===== */
+.amb-toggle{
+  position:absolute;top:12px;right:12px;z-index:15;
+  display:flex;align-items:center;gap:6px}
+.amb-btn{
+  width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.04);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all 0.3s;color:var(--text-ghost);font-size:16px}
+.amb-btn:hover{border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.08)}
+.amb-btn.active{border-color:hsla(var(--orb-h),50%,60%,0.3);color:var(--text-soft);
+  box-shadow:0 0 12px hsla(var(--orb-h),50%,50%,0.1)}
+.amb-panel{
+  position:absolute;top:52px;right:0;
+  background:rgba(12,13,20,0.92);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:14px;
+  padding:12px;min-width:180px;
+  opacity:0;transform:translateY(-8px) scale(0.95);pointer-events:none;
+  transition:all 0.25s cubic-bezier(0.4,0,0.2,1)}
+.amb-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.amb-panel-title{font-size:0.68rem;color:var(--text-ghost);letter-spacing:0.12em;
+  margin-bottom:8px;padding-left:4px}
+.amb-opt{
+  display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;
+  cursor:pointer;transition:all 0.2s;border:1px solid transparent}
+.amb-opt:hover{background:rgba(255,255,255,0.04)}
+.amb-opt.selected{background:hsla(var(--orb-h),30%,20%,0.25);
+  border-color:hsla(var(--orb-h),50%,50%,0.15)}
+.amb-opt .amb-ico{font-size:18px;width:28px;text-align:center;flex-shrink:0}
+.amb-opt .amb-label{font-size:0.82rem;color:var(--text-soft);font-weight:300}
+.amb-opt.selected .amb-label{color:var(--text-main)}
+.amb-vol{
+  display:flex;align-items:center;gap:8px;padding:8px 10px 4px;margin-top:4px;
+  border-top:1px solid rgba(255,255,255,0.05)}
+.amb-vol label{font-size:0.68rem;color:var(--text-ghost);flex-shrink:0}
+.amb-vol input[type=range]{
+  flex:1;height:3px;-webkit-appearance:none;appearance:none;
+  background:rgba(255,255,255,0.1);border-radius:2px;outline:none}
+.amb-vol input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+  background:hsla(var(--orb-h),60%,65%,0.8);cursor:pointer;border:none}
+
 /* ===== DISCLAIMER ===== */
 .disclaimer{position:absolute;bottom:8px;left:0;width:100%;text-align:center;
   font-size:0.65rem;color:var(--text-ghost);opacity:0.5;z-index:5;pointer-events:none}
@@ -703,6 +798,10 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   text-transform:uppercase}
 .takeaway-text{font-size:0.88rem;color:hsla(var(--orb-h),55%,78%,0.9);line-height:1.8;font-weight:300;
   letter-spacing:0.02em;font-style:italic}
+.micro-action{margin-top:1rem;padding-top:0.9rem;border-top:1px solid hsla(var(--orb-h),20%,40%,0.15)}
+.micro-action-label{font-size:0.6rem;color:var(--text-ghost);letter-spacing:0.1em;margin-bottom:0.4rem;opacity:0.7}
+.micro-action-text{font-size:0.82rem;color:hsla(45,60%,75%,0.85);line-height:1.7;font-weight:400;
+  letter-spacing:0.01em}
 
 /* ===== EMOTIONAL ECHO (subtle affirmation below voice text) ===== */
 /* emotional-echo fully removed */
@@ -856,9 +955,22 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
   </div>
 
   <div class="breathe-overlay" id="breatheOverlay">
-    <div class="breathe-orb" id="breatheOrb">準備</div>
-    <div class="breathe-text" id="breatheText">跟著光球一起呼吸</div>
-    <button class="breathe-skip" onclick="skipBreathe()">跳過</button>
+    <div class="breathe-picker" id="breathePicker">
+      <div class="burn-title" style="margin-bottom:1rem">選一種喘法</div>
+      <div class="amb-opt" onclick="startBreathe('478')" style="justify-content:center">
+        <span class="amb-ico">🫁</span><span class="amb-label">深呼吸（4-7-8）</span>
+      </div>
+      <div class="amb-opt" onclick="startBreathe('box')" style="justify-content:center">
+        <span class="amb-ico">⬜</span><span class="amb-label">方塊呼吸（4-4-4-4）</span>
+      </div>
+      <div class="amb-opt" onclick="startBreathe('sigh')" style="justify-content:center">
+        <span class="amb-ico">😮‍💨</span><span class="amb-label">嘆一口（大力嘆氣）</span>
+      </div>
+      <button class="breathe-skip" onclick="skipBreathe()" style="margin-top:0.8rem">算了不喘</button>
+    </div>
+    <div class="breathe-orb" id="breatheOrb" style="display:none">準備</div>
+    <div class="breathe-text" id="breatheText" style="display:none">跟著光球一起</div>
+    <button class="breathe-skip" id="breatheSkipBtn" onclick="skipBreathe()" style="display:none">跳過</button>
   </div>
 
   <div class="safety-banner" id="safetyBanner">
@@ -881,6 +993,10 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
     <div class="takeaway" id="takeawayCard">
       <div class="takeaway-label">帶走這句</div>
       <div class="takeaway-text" id="takeawayText"></div>
+      <div class="micro-action" id="microAction">
+        <div class="micro-action-label">💡 明天可以試試</div>
+        <div class="micro-action-text" id="microActionText"></div>
+      </div>
     </div>
     <div class="feedback-row" id="feedbackRow">
       <button class="fb-btn" data-fb="helpful">有被懂的感覺</button>
@@ -889,6 +1005,45 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
     </div>
     <div class="resource" id="endResource">需要真人聊聊：1925 安心專線（24H 免費，不會出現在帳單上）<br>我不是心理師，只是一個不會已讀你的地方</div>
     <button class="restart-btn" onclick="restartSession()">再來一輪</button>
+  </div>
+
+  <!-- BURN-IT OVERLAY -->
+  <div class="burn-overlay" id="burnOverlay">
+    <div class="burn-title" id="burnTitle">寫下最不爽的那句話<br>然後看它消失</div>
+    <div class="burn-area" id="burnArea">
+      <textarea class="burn-field" id="burnField" placeholder="打出來，不用客氣⋯" maxlength="200"></textarea>
+      <div class="burn-particles" id="burnParticles"></div>
+    </div>
+    <button class="burn-btn" id="burnBtn" onclick="executeBurn()">🔥 燒掉它</button>
+    <div class="burn-done" id="burnDone">燒乾淨了。舒服吧？</div>
+    <button class="burn-skip" onclick="closeBurn()">算了，不想寫</button>
+  </div>
+
+  <!-- AMBIENT SOUND CONTROL -->
+  <div class="amb-toggle" id="ambToggle">
+    <div class="amb-btn" id="ambBtn" onclick="toggleAmbPanel()">♪</div>
+    <div class="amb-panel" id="ambPanel">
+      <div class="amb-panel-title">換個場景</div>
+      <div class="amb-opt" data-sound="off" onclick="setAmbient('off')">
+        <span class="amb-ico">🔇</span><span class="amb-label">安靜</span>
+      </div>
+      <div class="amb-opt" data-sound="rain" onclick="setAmbient('rain')">
+        <span class="amb-ico">🌧️</span><span class="amb-label">雨夜</span>
+      </div>
+      <div class="amb-opt" data-sound="ocean" onclick="setAmbient('ocean')">
+        <span class="amb-ico">🌊</span><span class="amb-label">海浪</span>
+      </div>
+      <div class="amb-opt" data-sound="night" onclick="setAmbient('night')">
+        <span class="amb-ico">🦗</span><span class="amb-label">深夜蟲鳴</span>
+      </div>
+      <div class="amb-opt" data-sound="lofi" onclick="setAmbient('lofi')">
+        <span class="amb-ico">🎵</span><span class="amb-label">深夜電台</span>
+      </div>
+      <div class="amb-vol">
+        <label>音量</label>
+        <input type="range" min="0" max="100" value="40" id="ambVol" oninput="setAmbVolume(this.value)">
+      </div>
+    </div>
   </div>
 
   <div class="disclaimer">此服務不是醫療行為，無法取代專業諮商</div>
@@ -1679,7 +1834,117 @@ function getTakeawayText(){
   };
 
   const list = pool[c]?.[tier] || pool.general[tier];
-  return list[Math.floor(Math.random() * list.length)];
+  const quote = list[Math.floor(Math.random() * list.length)];
+
+  // 微行動 micro-action pool — 具體、可執行、不說教
+  const actions = {
+    ai: {
+      low: [
+        '明天打開任何一個 AI 工具，隨便問它一個問題就好。不用學會，碰一下就算贏。',
+        '今晚 Google 一個「AI 取代不了的工作技能」——看完不用做筆記，知道就好。',
+        '找一個你覺得很煩的重複工作，想想「這個能不能丟給 AI？」想到就好，不用行動。'
+      ],
+      mid: [
+        '明天花 15 分鐘，用 AI 搞定一件你一直拖著的小事。體驗一次「原來這麼快」。',
+        '把你最煩的一個工作流程寫下來，三行就好。這是你跟 AI 協作的起點。',
+        '問問身邊有在用 AI 的同事：「你都用什麼？」聽就好，不用馬上學。'
+      ],
+      high: [
+        '趁今天有精神，挑一個 AI 工具玩 30 分鐘。不設目標，純探索。',
+        '找一件你擅長但做膩了的事，試試用 AI 幫你做前半段。你負責「把關」就好。',
+        '用 AI 幫你寫一封你一直沒回的 email。你再改就好，不用從零開始。'
+      ]
+    },
+    career: {
+      low: [
+        '今晚洗澡的時候多站 30 秒，什麼都不想。你的身體也需要休息。',
+        '明天起床後，花一分鐘想一件「今天還不算太討厭」的事。一件就好。',
+        '今晚把手機放客廳，不帶進臥室。讓腦袋休息一下。'
+      ],
+      mid: [
+        '找一個你覺得活得還不錯的人，下週約他喝杯咖啡。不用有目的，聊就好。',
+        '今天回家路上不開 LINE。用那 20 分鐘聽一首你高中聽的歌。',
+        '寫下三件你這五年做過「還不錯」的事。不用給別人看，自己收著就好。'
+      ],
+      high: [
+        '趁今天狀態好，做一件你拖了超過一週的事。做完會很爽。',
+        '列出三個你「有點好奇但一直沒研究」的領域。不用行動，先寫下來。',
+        '跟一個你信得過的人聊聊你最近的想法。出路常常是聊出來的。'
+      ]
+    },
+    burnout: {
+      low: [
+        '今晚 11 點前躺到床上。不用睡著，躺著就好。',
+        '明天中午吃飯的時候放下手機，好好吃。十五分鐘就好。',
+        '取消明天一個「其實不去也不會怎樣」的行程。把時間還給自己。'
+      ],
+      mid: [
+        '今天回家後，做一件「只為自己」的事。泡茶、看漫畫、發呆都算。',
+        '明天上班前，在便利商店多站一分鐘。買一樣平常不會買的東西犒賞自己。',
+        '今晚花五分鐘，把你最想抱怨的事寫下來。寫完可以刪掉，重點是寫。'
+      ],
+      high: [
+        '今天狀態不錯——安排一個「這週末只做想做的事」的時段。至少兩小時。',
+        '趁有精神，把你的行事曆打開，刪掉一個不重要的會議。',
+        '今天晚上煮一頓自己想吃的。不用多厲害，煮就對了。'
+      ]
+    },
+    meaning: {
+      low: [
+        '明天注意一件讓你覺得「還不討厭」的事。一件就好。可能是一杯咖啡、一個笑話。',
+        '今晚花三分鐘，寫下一個你小時候覺得很酷的事。不用分析為什麼，寫就好。',
+        '明天出門的時候，抬頭看一下天空。30 秒就好。'
+      ],
+      mid: [
+        '這週找一件「你以前喜歡但很久沒做」的事，做一次。不用做好，做就好。',
+        '問自己：「如果明天不用上班，我會幹嘛？」答案可能就是線索。',
+        '今天睡前回想一個「你幫過別人」的時刻。不用多偉大，有就好。'
+      ],
+      high: [
+        '趁今天心情不錯，做一件「有點冒險但想很久」的小事。報名一個課、去一個沒去過的地方。',
+        '找一件你覺得「做了世界會好一點點」的事。不用偉大——撿個垃圾也算。',
+        '今天跟一個你在乎的人說一句真心話。不用很煽情，簡單就好。'
+      ]
+    },
+    chat: {
+      low: [
+        '今晚洗澡多花一分鐘，讓熱水沖脖子後面。不想事情，專心感覺水溫。',
+        '明天找一個你信得過的人，說一句「最近有點累」。不用解釋，講就好。',
+        '今晚睡前深呼吸三次。吸四秒、吐六秒。就三次，不用多。'
+      ],
+      mid: [
+        '下次想靠北的時候，打開備忘錄寫下來。寫完不用看，關掉就好。腦袋會輕一點。',
+        '明天做一件「只花五分鐘但拖很久」的事。付一張帳單、回一封 email 都算。',
+        '今天回家路上換一條路走。不用有原因，換個風景。'
+      ],
+      high: [
+        '趁現在有電，做一件你一直拖著沒做的事。就一件，做完會很爽。',
+        '今天跟一個好久沒聯絡的朋友傳個訊息。不用長，「最近好嗎」就夠了。',
+        '明天花十分鐘做一件「純粹讓自己開心」的事。不用有用，開心就好。'
+      ]
+    },
+    general: {
+      low: [
+        '今晚比平常早十分鐘上床。不用睡著，躺著放空就好。',
+        '明天起床後喝一杯溫水，慢慢喝。這是你今天對自己做的第一件好事。',
+        '把手機螢幕使用時間看一下。不用改，看一下就好。意識到就是改變的起點。'
+      ],
+      mid: [
+        '找一件「做了不會後悔」的小事，今天做掉。可能是運動十分鐘、整理一個抽屜。',
+        '今天跟一個人說「謝謝」，認真地說。對象隨便，說就好。',
+        '明天中午休息的時候，離開座位走五分鐘。不滑手機，走就好。'
+      ],
+      high: [
+        '今天狀態不錯——列出三件你「最近想做但一直沒做」的事。挑一件，這週做掉。',
+        '趁有精神，整理一下你的桌面或房間一角。環境清爽，腦袋也會。',
+        '今天對自己說一句好話。不用很肉麻，「今天還不錯」就可以了。'
+      ]
+    }
+  };
+
+  const actionList = actions[c]?.[tier] || actions.general[tier];
+  const action = actionList[Math.floor(Math.random() * actionList.length)];
+  return { quote, action };
 }
 
 function buildConversationTree(){
@@ -2366,7 +2631,7 @@ function navigateTo(nodeId){
       } else if(currentNode.after === 'breathe_suggest'){
         setTimeout(() => showBreatheSuggest(), 1000);
       } else if(currentNode.after === 'breathe_offer'){
-        setTimeout(() => startBreathe(), 1500);
+        setTimeout(() => startBreathe(null), 1500);
       } else if(currentNode.after === 'show_safety'){
         showSafety();
         setTimeout(() => showReplies(), 1500);
@@ -2574,9 +2839,18 @@ function showBreatheSuggest(){
 
   const breatheBtn = document.createElement('button');
   breatheBtn.className = 'choice-pill';
-  breatheBtn.textContent = '做一個呼吸練習';
+  breatheBtn.textContent = '喘口氣';
   breatheBtn.onclick = () => { hideChoices(); startBreathe(); };
   ring.appendChild(breatheBtn);
+
+  // Burn-it option — appears after enough depth
+  if(messageCount >= 3){
+    const burnBtn = document.createElement('button');
+    burnBtn.className = 'choice-pill';
+    burnBtn.textContent = '🔥 燒掉它';
+    burnBtn.onclick = () => { hideChoices(); showBurn(); };
+    ring.appendChild(burnBtn);
+  }
 
   if(currentNode && currentNode.replies){
     currentNode.replies.forEach(r => {
@@ -2596,44 +2870,102 @@ function showBreatheSuggest(){
 }
 
 let breatheTimer = null;
-function startBreathe(){
+const breatheMethods = {
+  '478': {
+    name: '深呼吸',
+    phases: [
+      {label:'吸氣', cls:'inhale', dur:4000},
+      {label:'停住', cls:'hold', dur:7000},
+      {label:'吐氣', cls:'exhale', dur:8000}
+    ],
+    cycles: 2
+  },
+  'box': {
+    name: '方塊呼吸',
+    phases: [
+      {label:'吸氣', cls:'inhale', dur:4000},
+      {label:'停住', cls:'hold', dur:4000},
+      {label:'吐氣', cls:'exhale', dur:4000},
+      {label:'停住', cls:'hold', dur:4000}
+    ],
+    cycles: 2
+  },
+  'sigh': {
+    name: '嘆一口',
+    phases: [
+      {label:'深——吸——', cls:'inhale', dur:5000},
+      {label:'用力嘆出來', cls:'exhale', dur:3000},
+      {label:'⋯⋯', cls:'', dur:2000}
+    ],
+    cycles: 3
+  }
+};
+
+function startBreathe(method){
+  method = method || '478';
   const overlay = document.getElementById('breatheOverlay');
+  const picker = document.getElementById('breathePicker');
   const orb = document.getElementById('breatheOrb');
   const text = document.getElementById('breatheText');
+  const skipBtn = document.getElementById('breatheSkipBtn');
+
+  if(!method){
+    // Show picker
+    overlay.classList.add('visible');
+    picker.style.display = '';
+    orb.style.display = 'none';
+    text.style.display = 'none';
+    skipBtn.style.display = 'none';
+    return;
+  }
+
+  // Hide picker, show orb
+  picker.style.display = 'none';
+  orb.style.display = '';
+  text.style.display = '';
+  skipBtn.style.display = '';
   overlay.classList.add('visible');
 
-  const phases = [
-    {label:'吸氣', cls:'inhale', dur:4000},
-    {label:'停住', cls:'hold', dur:4000},
-    {label:'吐氣', cls:'exhale', dur:4000}
-  ];
+  const m = breatheMethods[method] || breatheMethods['478'];
   let cycle = 0;
   let phase = 0;
 
   function runPhase(){
-    if(cycle >= 2){
+    if(cycle >= m.cycles){
       overlay.classList.remove('visible');
       orb.className = 'breathe-orb';
+      picker.style.display = '';
+      orb.style.display = 'none';
+      text.style.display = 'none';
+      skipBtn.style.display = 'none';
       setTimeout(() => showReplies(), 600);
       return;
     }
-    const p = phases[phase];
-    orb.className = 'breathe-orb ' + p.cls;
+    const p = m.phases[phase];
+    orb.className = 'breathe-orb ' + (p.cls || '');
     orb.textContent = p.label;
-    text.textContent = `第 ${cycle+1} 輪 / 2`;
+    text.textContent = `${m.name}｜第 ${cycle+1} / ${m.cycles} 輪`;
 
     breatheTimer = setTimeout(() => {
       phase++;
-      if(phase >= phases.length){ phase = 0; cycle++; }
+      if(phase >= m.phases.length){ phase = 0; cycle++; }
       runPhase();
     }, p.dur);
   }
   runPhase();
 }
+
 function skipBreathe(){
   if(breatheTimer) clearTimeout(breatheTimer);
-  document.getElementById('breatheOverlay').classList.remove('visible');
-  document.getElementById('breatheOrb').className = 'breathe-orb';
+  const overlay = document.getElementById('breatheOverlay');
+  const picker = document.getElementById('breathePicker');
+  const orb = document.getElementById('breatheOrb');
+  overlay.classList.remove('visible');
+  orb.className = 'breathe-orb';
+  picker.style.display = '';
+  orb.style.display = 'none';
+  document.getElementById('breatheText').style.display = 'none';
+  document.getElementById('breatheSkipBtn').style.display = 'none';
   setTimeout(() => showReplies(), 400);
 }
 
@@ -2706,7 +3038,9 @@ function endSession(){
 
   // Show takeaway card
   const takeaway = document.getElementById('takeawayCard');
-  document.getElementById('takeawayText').textContent = getTakeawayText();
+  const takeawayData = getTakeawayText();
+  document.getElementById('takeawayText').textContent = takeawayData.quote;
+  document.getElementById('microActionText').textContent = takeawayData.action;
   setTimeout(() => takeaway.classList.add('visible'), 800 + colorJourney.length * 120);
 
   document.getElementById('sessionEnd').classList.add('visible');
@@ -2939,6 +3273,484 @@ function restoreSession(){
   setTimeout(() => initGoogleAuth(), 500);
 }
 restoreSession();
+
+// ===== BURN-IT (文字銷毀紓壓) =====
+function showBurn(){
+  const overlay = document.getElementById('burnOverlay');
+  const field = document.getElementById('burnField');
+  const btn = document.getElementById('burnBtn');
+  const done = document.getElementById('burnDone');
+  const area = document.getElementById('burnArea');
+  const title = document.getElementById('burnTitle');
+
+  // Reset state
+  field.value = '';
+  field.disabled = false;
+  btn.classList.remove('ready');
+  done.classList.remove('visible');
+  area.classList.remove('burning');
+  title.textContent = '寫下最不爽的那句話\n然後看它消失';
+  overlay.classList.add('active');
+  setTimeout(() => field.focus(), 300);
+}
+
+// Enable burn button when text is entered
+document.getElementById('burnField').addEventListener('input', function(){
+  document.getElementById('burnBtn').classList.toggle('ready', this.value.trim().length > 0);
+});
+
+function executeBurn(){
+  const field = document.getElementById('burnField');
+  const area = document.getElementById('burnArea');
+  const btn = document.getElementById('burnBtn');
+  const done = document.getElementById('burnDone');
+  const title = document.getElementById('burnTitle');
+  const particles = document.getElementById('burnParticles');
+
+  if(!field.value.trim()) return;
+
+  field.disabled = true;
+  btn.style.display = 'none';
+  title.style.opacity = '0';
+
+  // Spawn fire particles
+  particles.innerHTML = '';
+  const colors = ['#ff4400','#ff6633','#ff8844','#ffaa33','#ff3311'];
+  for(let i = 0; i < 30; i++){
+    const p = document.createElement('div');
+    p.className = 'burn-particle';
+    p.style.left = (10 + Math.random() * 80) + '%';
+    p.style.top = (20 + Math.random() * 60) + '%';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width = (3 + Math.random() * 5) + 'px';
+    p.style.height = p.style.width;
+    p.style.animationDelay = (Math.random() * 0.8) + 's';
+    p.style.animationDuration = (1 + Math.random() * 1) + 's';
+    particles.appendChild(p);
+    setTimeout(() => p.classList.add('active'), 50 + i * 30);
+  }
+
+  // Start burn animation
+  area.classList.add('burning');
+
+  // Show done message
+  setTimeout(() => {
+    const doneTexts = [
+      '燒乾淨了。舒服吧？',
+      '沒了。就這麼簡單。',
+      '灰都不剩。心裡有沒有鬆一點？',
+      '燒完了。那些字不會追你了。'
+    ];
+    done.textContent = doneTexts[Math.floor(Math.random() * doneTexts.length)];
+    done.classList.add('visible');
+  }, 2200);
+
+  // Auto close after delay
+  setTimeout(() => closeBurn(), 5000);
+}
+
+function closeBurn(){
+  const overlay = document.getElementById('burnOverlay');
+  overlay.classList.remove('active');
+  const btn = document.getElementById('burnBtn');
+  const title = document.getElementById('burnTitle');
+  btn.style.display = '';
+  title.style.opacity = '';
+  // Resume conversation flow
+  if(currentNode && currentNode.replies && currentNode.replies.length){
+    setTimeout(() => showReplies(), 500);
+  }
+}
+
+// ===== AMBIENT SOUND ENGINE (Web Audio API — procedural generation) =====
+const AMB = {
+  ctx: null,
+  master: null,
+  current: 'off',
+  volume: 0.4,
+  nodes: [],
+  fadeTime: 2.0,
+
+  init(){
+    if(this.ctx) return;
+    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    this.master = this.ctx.createGain();
+    this.master.gain.value = this.volume;
+    this.master.connect(this.ctx.destination);
+  },
+
+  resume(){
+    if(this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+
+  stop(){
+    const now = this.ctx.currentTime;
+    this.nodes.forEach(n => {
+      try{
+        if(n.gain) n.gain.gain.linearRampToValueAtTime(0, now + this.fadeTime);
+        setTimeout(() => { try{ n.source.stop(); }catch(e){} }, this.fadeTime * 1000 + 100);
+      }catch(e){}
+    });
+    this.nodes = [];
+  },
+
+  // === RAIN: filtered brown noise + occasional drip accents ===
+  rain(){
+    const ctx = this.ctx;
+    const len = ctx.sampleRate * 4; // 4 sec buffer, loops seamlessly
+    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    // Brown noise (integrated white noise)
+    for(let ch = 0; ch < 2; ch++){
+      const data = buf.getChannelData(ch);
+      let last = 0;
+      for(let i = 0; i < len; i++){
+        const white = Math.random() * 2 - 1;
+        last = (last + 0.02 * white) / 1.02;
+        data[i] = last * 3.5;
+        // Subtle stereo variation
+        if(ch === 1) data[i] *= 0.95 + Math.random() * 0.1;
+      }
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+
+    // Bandpass filter for rain character
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 800;
+    bp.Q.value = 0.5;
+
+    // High shelf for crispness
+    const hs = ctx.createBiquadFilter();
+    hs.type = 'highshelf';
+    hs.frequency.value = 3000;
+    hs.gain.value = 4;
+
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    gain.gain.linearRampToValueAtTime(0.7, ctx.currentTime + this.fadeTime);
+
+    src.connect(bp).connect(hs).connect(gain).connect(this.master);
+    src.start();
+    this.nodes.push({source: src, gain: gain});
+
+    // Layer 2: high frequency patter (light rain texture)
+    const buf2 = ctx.createBuffer(2, len, ctx.sampleRate);
+    for(let ch = 0; ch < 2; ch++){
+      const d = buf2.getChannelData(ch);
+      for(let i = 0; i < len; i++){
+        d[i] = (Math.random() * 2 - 1) * (Math.random() < 0.3 ? 0.4 : 0.05);
+      }
+    }
+    const src2 = ctx.createBufferSource();
+    src2.buffer = buf2;
+    src2.loop = true;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 4000;
+    const g2 = ctx.createGain();
+    g2.gain.value = 0;
+    g2.gain.linearRampToValueAtTime(0.25, ctx.currentTime + this.fadeTime);
+    src2.connect(hp).connect(g2).connect(this.master);
+    src2.start();
+    this.nodes.push({source: src2, gain: g2});
+  },
+
+  // === OCEAN: modulated noise with slow LFO for wave rhythm ===
+  ocean(){
+    const ctx = this.ctx;
+    const len = ctx.sampleRate * 8;
+    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for(let ch = 0; ch < 2; ch++){
+      const d = buf.getChannelData(ch);
+      let last = 0;
+      for(let i = 0; i < len; i++){
+        const w = Math.random() * 2 - 1;
+        last = (last + 0.015 * w) / 1.015;
+        // Wave envelope
+        const t = i / ctx.sampleRate;
+        const wave = 0.4 + 0.6 * Math.pow(Math.sin(t * Math.PI * 2 / 6.5) * 0.5 + 0.5, 1.5);
+        d[i] = last * 4 * wave;
+        if(ch === 1){
+          const wave2 = 0.4 + 0.6 * Math.pow(Math.sin((t + 1.2) * Math.PI * 2 / 7.3) * 0.5 + 0.5, 1.5);
+          d[i] = last * 4 * wave2;
+        }
+      }
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 600;
+    lp.Q.value = 0.3;
+
+    // Slow LFO on filter frequency for wave movement
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.frequency.value = 0.08; // Very slow wave
+    lfoGain.gain.value = 300;
+    lfo.connect(lfoGain).connect(lp.frequency);
+    lfo.start();
+
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    gain.gain.linearRampToValueAtTime(0.65, ctx.currentTime + this.fadeTime);
+
+    src.connect(lp).connect(gain).connect(this.master);
+    src.start();
+    this.nodes.push({source: src, gain: gain});
+    this.nodes.push({source: lfo, gain: lfoGain});
+
+    // Subtle high-freq foam
+    const buf2 = ctx.createBuffer(1, ctx.sampleRate * 6, ctx.sampleRate);
+    const d2 = buf2.getChannelData(0);
+    for(let i = 0; i < d2.length; i++){
+      const t = i / ctx.sampleRate;
+      const env = Math.pow(Math.max(0, Math.sin(t * Math.PI * 2 / 6.5)), 3);
+      d2[i] = (Math.random() * 2 - 1) * env * 0.3;
+    }
+    const src2 = ctx.createBufferSource();
+    src2.buffer = buf2;
+    src2.loop = true;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 2000;
+    const g2 = ctx.createGain();
+    g2.gain.value = 0;
+    g2.gain.linearRampToValueAtTime(0.2, ctx.currentTime + this.fadeTime);
+    src2.connect(hp).connect(g2).connect(this.master);
+    src2.start();
+    this.nodes.push({source: src2, gain: g2});
+  },
+
+  // === NIGHT: cricket chirps + gentle wind ===
+  night(){
+    const ctx = this.ctx;
+
+    // Base: very gentle brown noise (wind)
+    const len = ctx.sampleRate * 5;
+    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for(let ch = 0; ch < 2; ch++){
+      const d = buf.getChannelData(ch);
+      let last = 0;
+      for(let i = 0; i < len; i++){
+        last = (last + 0.008 * (Math.random() * 2 - 1)) / 1.008;
+        const t = i / ctx.sampleRate;
+        const gust = 0.6 + 0.4 * Math.sin(t * Math.PI * 2 / 4.2 + ch * 0.8);
+        d[i] = last * 2.5 * gust;
+      }
+    }
+    const windSrc = ctx.createBufferSource();
+    windSrc.buffer = buf;
+    windSrc.loop = true;
+    const windLp = ctx.createBiquadFilter();
+    windLp.type = 'lowpass';
+    windLp.frequency.value = 400;
+    const windG = ctx.createGain();
+    windG.gain.value = 0;
+    windG.gain.linearRampToValueAtTime(0.35, ctx.currentTime + this.fadeTime);
+    windSrc.connect(windLp).connect(windG).connect(this.master);
+    windSrc.start();
+    this.nodes.push({source: windSrc, gain: windG});
+
+    // Cricket layer: high-freq oscillators with rhythmic envelope
+    const cLen = ctx.sampleRate * 6;
+    const cBuf = ctx.createBuffer(2, cLen, ctx.sampleRate);
+    for(let ch = 0; ch < 2; ch++){
+      const d = cBuf.getChannelData(ch);
+      const baseFreq = 4200 + ch * 300 + Math.random() * 400;
+      const chirpRate = 11 + Math.random() * 4; // chirps per second
+      for(let i = 0; i < cLen; i++){
+        const t = i / ctx.sampleRate;
+        // Cricket chirp envelope
+        const chirpPhase = (t * chirpRate) % 1;
+        const env = chirpPhase < 0.15 ? Math.sin(chirpPhase / 0.15 * Math.PI) : 0;
+        // Slightly detuned pair
+        const sig = Math.sin(t * baseFreq * Math.PI * 2) * 0.5 +
+                    Math.sin(t * (baseFreq + 15) * Math.PI * 2) * 0.5;
+        // Random gaps (crickets pause)
+        const sec = Math.floor(t);
+        const active = ((sec * 7 + ch * 3) % 5) < 3;
+        d[i] = sig * env * (active ? 0.08 : 0) * (0.8 + 0.2 * Math.sin(t * 0.3));
+      }
+    }
+    const cSrc = ctx.createBufferSource();
+    cSrc.buffer = cBuf;
+    cSrc.loop = true;
+    const cG = ctx.createGain();
+    cG.gain.value = 0;
+    cG.gain.linearRampToValueAtTime(0.45, ctx.currentTime + this.fadeTime);
+    cSrc.connect(cG).connect(this.master);
+    cSrc.start();
+    this.nodes.push({source: cSrc, gain: cG});
+  },
+
+  // === LOFI: warm drone pad + subtle rhythmic pulse ===
+  lofi(){
+    const ctx = this.ctx;
+
+    // Warm pad: stacked detuned sine waves
+    const padNotes = [110, 164.81, 220, 329.63]; // Am chord tones
+    padNotes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      // Slight vibrato
+      const vibLfo = ctx.createOscillator();
+      const vibG = ctx.createGain();
+      vibLfo.frequency.value = 0.3 + idx * 0.1;
+      vibG.gain.value = freq * 0.003;
+      vibLfo.connect(vibG).connect(osc.frequency);
+      vibLfo.start();
+
+      const g = ctx.createGain();
+      g.gain.value = 0;
+      const targetVol = idx === 0 ? 0.12 : idx === 2 ? 0.1 : 0.06;
+      g.gain.linearRampToValueAtTime(targetVol, ctx.currentTime + this.fadeTime);
+
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 800 - idx * 100;
+
+      osc.connect(lp).connect(g).connect(this.master);
+      osc.start();
+      this.nodes.push({source: osc, gain: g});
+      this.nodes.push({source: vibLfo, gain: vibG});
+    });
+
+    // Subtle vinyl crackle
+    const crLen = ctx.sampleRate * 3;
+    const crBuf = ctx.createBuffer(1, crLen, ctx.sampleRate);
+    const crD = crBuf.getChannelData(0);
+    for(let i = 0; i < crLen; i++){
+      crD[i] = Math.random() < 0.002 ? (Math.random() * 2 - 1) * 0.5 :
+               (Math.random() * 2 - 1) * 0.005;
+    }
+    const crSrc = ctx.createBufferSource();
+    crSrc.buffer = crBuf;
+    crSrc.loop = true;
+    const crHp = ctx.createBiquadFilter();
+    crHp.type = 'highpass';
+    crHp.frequency.value = 1000;
+    const crG = ctx.createGain();
+    crG.gain.value = 0;
+    crG.gain.linearRampToValueAtTime(0.15, ctx.currentTime + this.fadeTime);
+    crSrc.connect(crHp).connect(crG).connect(this.master);
+    crSrc.start();
+    this.nodes.push({source: crSrc, gain: crG});
+
+    // Slow rhythmic pulse (like a distant heartbeat / lo-fi beat)
+    const pLen = ctx.sampleRate * 4;
+    const pBuf = ctx.createBuffer(1, pLen, ctx.sampleRate);
+    const pD = pBuf.getChannelData(0);
+    const bpm = 70;
+    const beatSamples = Math.floor(ctx.sampleRate * 60 / bpm);
+    for(let i = 0; i < pLen; i++){
+      const inBeat = i % beatSamples;
+      const beatT = inBeat / ctx.sampleRate;
+      // Soft kick: low freq sine with quick decay
+      const kickEnv = Math.exp(-beatT * 8);
+      const kick = Math.sin(beatT * 55 * Math.PI * 2) * kickEnv * 0.3;
+      pD[i] = kick;
+    }
+    const pSrc = ctx.createBufferSource();
+    pSrc.buffer = pBuf;
+    pSrc.loop = true;
+    const pLp = ctx.createBiquadFilter();
+    pLp.type = 'lowpass';
+    pLp.frequency.value = 120;
+    const pG = ctx.createGain();
+    pG.gain.value = 0;
+    pG.gain.linearRampToValueAtTime(0.3, ctx.currentTime + this.fadeTime);
+    pSrc.connect(pLp).connect(pG).connect(this.master);
+    pSrc.start();
+    this.nodes.push({source: pSrc, gain: pG});
+  }
+};
+
+let ambPanelOpen = false;
+function toggleAmbPanel(){
+  AMB.init();
+  AMB.resume();
+  ambPanelOpen = !ambPanelOpen;
+  document.getElementById('ambPanel').classList.toggle('open', ambPanelOpen);
+}
+
+// Close panel when clicking outside
+document.addEventListener('click', e => {
+  if(ambPanelOpen && !document.getElementById('ambToggle').contains(e.target)){
+    ambPanelOpen = false;
+    document.getElementById('ambPanel').classList.remove('open');
+  }
+});
+
+function setAmbient(type){
+  AMB.init();
+  AMB.resume();
+
+  // Stop current
+  if(AMB.nodes.length) AMB.stop();
+
+  AMB.current = type;
+
+  // Update UI
+  document.querySelectorAll('.amb-opt').forEach(el => {
+    el.classList.toggle('selected', el.dataset.sound === type);
+  });
+  document.getElementById('ambBtn').classList.toggle('active', type !== 'off');
+
+  // Start new
+  if(type === 'rain') AMB.rain();
+  else if(type === 'ocean') AMB.ocean();
+  else if(type === 'night') AMB.night();
+  else if(type === 'lofi') AMB.lofi();
+
+  // Save preference
+  try{ localStorage.setItem('dashu_ambient', type); }catch(e){}
+}
+
+function setAmbVolume(val){
+  AMB.init();
+  AMB.volume = val / 100;
+  if(AMB.master) AMB.master.gain.value = AMB.volume;
+  try{ localStorage.setItem('dashu_amb_vol', val); }catch(e){}
+}
+
+// Restore ambient preference on load
+(function(){
+  try{
+    const saved = localStorage.getItem('dashu_ambient');
+    const vol = localStorage.getItem('dashu_amb_vol');
+    if(vol){
+      AMB.volume = parseInt(vol) / 100;
+      document.getElementById('ambVol').value = vol;
+    }
+    if(saved && saved !== 'off'){
+      // Mark UI as selected but don't auto-play (needs user gesture)
+      document.querySelectorAll('.amb-opt').forEach(el => {
+        el.classList.toggle('selected', el.dataset.sound === saved);
+      });
+      document.getElementById('ambBtn').classList.add('active');
+      // Auto-play on first user interaction
+      const autoStart = () => {
+        AMB.init();
+        AMB.resume();
+        AMB.current = saved;
+        if(saved === 'rain') AMB.rain();
+        else if(saved === 'ocean') AMB.ocean();
+        else if(saved === 'night') AMB.night();
+        else if(saved === 'lofi') AMB.lofi();
+        document.removeEventListener('click', autoStart);
+        document.removeEventListener('touchstart', autoStart);
+      };
+      document.addEventListener('click', autoStart, {once:true});
+      document.addEventListener('touchstart', autoStart, {once:true});
+    }
+  }catch(e){}
+})();
 
 // ===== PWA Service Worker Registration =====
 if('serviceWorker' in navigator){
