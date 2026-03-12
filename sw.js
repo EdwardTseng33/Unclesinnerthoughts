@@ -1,10 +1,10 @@
-// 大叔心聲 Service Worker v5.1
-const CACHE_NAME = 'dashu-v5.3';
+// 大叔心聲 Service Worker v5.4
+const CACHE_NAME = 'dashu-v5.4';
 const ASSETS = [
   '/',
   '/index.html',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/dashu-192.png',
+  '/dashu-512.png',
   '/og-image.png',
   'https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&display=swap'
 ];
