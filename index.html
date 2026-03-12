@@ -93,7 +93,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
     0 0 50px hsla(var(--orb-h),70%,60%,0.25),
     0 0 100px hsla(var(--orb-h),50%,45%,0.10),
     inset 0 0 40px rgba(255,255,255,0.10);
-  animation:orbBreathe 5s ease-in-out infinite;
+  /* no idle motion — orb stays still until interacted with */
   transition:background 2s cubic-bezier(0.4,0,0.2,1), box-shadow 2s cubic-bezier(0.4,0,0.2,1);
   -webkit-clip-path:circle(50%);clip-path:circle(50%);overflow:hidden}
 
@@ -104,7 +104,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
     rgba(255,255,255,0.6) 0%,
     rgba(255,255,255,0.3) 25%,
     transparent 55%);
-  animation:orbLightRotate 6s ease-in-out infinite;
+  /* no idle light rotate */
   pointer-events:none}
 
 /* Internal caustics / shimmer layer */
@@ -114,13 +114,13 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
     radial-gradient(ellipse at 65% 70%, rgba(255,255,255,0.28) 0%, transparent 50%),
     radial-gradient(ellipse at 25% 55%, rgba(255,255,255,0.22) 0%, transparent 45%),
     radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.15) 0%, transparent 40%);
-  animation:orbCaustics 4.5s ease-in-out infinite alternate;
+  /* no idle caustics */
   mix-blend-mode:soft-light;pointer-events:none}
 
 .orb-glow{position:absolute;top:50%;left:50%;width:200px;height:200px;
   transform:translate(-50%,-50%);border-radius:50%;
   background:radial-gradient(circle,hsla(var(--orb-h),60%,60%,0.08) 0%,transparent 70%);
-  animation:glowPulse 4s ease-in-out infinite alternate;
+  /* no idle glow pulse */
   transition:all 2s}
 
 /* Ambient halo — soft outer atmosphere that breathes independently */
@@ -130,7 +130,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
     hsla(var(--orb-h),55%,60%,0.10) 0%,
     hsla(var(--orb-h),45%,50%,0.04) 40%,
     transparent 70%);
-  animation:haloBreath 6s ease-in-out infinite alternate;
+  /* no idle halo breath */
   transition:all 2.5s;pointer-events:none}
 
 /* rings removed */
