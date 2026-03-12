@@ -1,5 +1,5 @@
-// 大叔心聲 Service Worker v5.4
-const CACHE_NAME = 'dashu-v6.1';
+// 大叔心聲 Service Worker v7.0
+const CACHE_NAME = 'dashu-v7.0';
 const ASSETS = [
   '/',
   '/index.html',

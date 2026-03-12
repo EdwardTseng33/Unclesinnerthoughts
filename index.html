@@ -1027,7 +1027,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
         <span class="amb-ico">🔇</span><span class="amb-label">安靜</span>
       </div>
       <div class="amb-opt" data-sound="rain" onclick="setAmbient('rain')">
-        <span class="amb-ico">🌧️</span><span class="amb-label">雨夜</span>
+        <span class="amb-ico">🌧️</span><span class="amb-label">雨夜鋼琴</span>
       </div>
       <div class="amb-opt" data-sound="ocean" onclick="setAmbient('ocean')">
         <span class="amb-ico">🌊</span><span class="amb-label">海浪</span>
@@ -1035,8 +1035,11 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
       <div class="amb-opt" data-sound="night" onclick="setAmbient('night')">
         <span class="amb-ico">🦗</span><span class="amb-label">深夜蟲鳴</span>
       </div>
-      <div class="amb-opt" data-sound="lofi" onclick="setAmbient('lofi')">
-        <span class="amb-ico">🎵</span><span class="amb-label">深夜電台</span>
+      <div class="amb-opt" data-sound="healing" onclick="setAmbient('healing')">
+        <span class="amb-ico">🎵</span><span class="amb-label">療癒旋律</span>
+      </div>
+      <div class="amb-opt" data-sound="guzheng" onclick="setAmbient('guzheng')">
+        <span class="amb-ico">🎋</span><span class="amb-label">竹林古韻</span>
       </div>
       <div class="amb-vol">
         <label>音量</label>
@@ -3360,319 +3363,90 @@ function closeBurn(){
   }
 }
 
-// ===== AMBIENT SOUND ENGINE (Web Audio API — procedural generation) =====
+// ===== AMBIENT SOUND ENGINE (Real audio files with crossfade) =====
 const AMB = {
-  ctx: null,
-  master: null,
+  audio: null,
   current: 'off',
   volume: 0.4,
-  nodes: [],
-  fadeTime: 2.0,
-
-  init(){
-    if(this.ctx) return;
-    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    this.master = this.ctx.createGain();
-    this.master.gain.value = this.volume;
-    this.master.connect(this.ctx.destination);
+  fadeMs: 2000,
+  _fadeTimer: null,
+  tracks: {
+    rain:    'audio/rain-piano.mp3',
+    ocean:   'audio/ocean-waves.mp3',
+    night:   'audio/night-crickets.mp3',
+    healing: 'audio/healing-melody.mp3',
+    guzheng: 'audio/guzheng-bamboo.mp3'
   },
 
-  resume(){
-    if(this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
-  },
-
-  stop(){
-    const now = this.ctx.currentTime;
-    this.nodes.forEach(n => {
-      try{
-        if(n.gain){ n.gain.gain.setValueAtTime(n.gain.gain.value, now); n.gain.gain.linearRampToValueAtTime(0, now + this.fadeTime); }
-        setTimeout(() => { try{ n.source.stop(); }catch(e){} }, this.fadeTime * 1000 + 100);
-      }catch(e){}
+  play(type){
+    if(type === 'off' || !this.tracks[type]){ this.stop(); return; }
+    // Fade out current, then start new
+    this._fadeOut(() => {
+      const a = new Audio(this.tracks[type]);
+      a.loop = true;
+      a.volume = 0;
+      a.preload = 'auto';
+      // Handle load errors gracefully
+      a.onerror = () => console.warn('Ambient audio load failed:', type);
+      const startPlay = () => {
+        a.play().then(() => this._fadeIn(a)).catch(e => console.warn('Ambient play blocked:', e));
+      };
+      // If audio is ready, play immediately; otherwise wait for canplay
+      if(a.readyState >= 3) startPlay();
+      else a.addEventListener('canplay', startPlay, {once:true});
+      this.audio = a;
+      this.current = type;
     });
-    this.nodes = [];
   },
 
-  // === RAIN: filtered brown noise + occasional drip accents ===
-  rain(){
-    const ctx = this.ctx;
-    const len = ctx.sampleRate * 4; // 4 sec buffer, loops seamlessly
-    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-    // Brown noise (integrated white noise)
-    for(let ch = 0; ch < 2; ch++){
-      const data = buf.getChannelData(ch);
-      let last = 0;
-      for(let i = 0; i < len; i++){
-        const white = Math.random() * 2 - 1;
-        last = (last + 0.02 * white) / 1.02;
-        data[i] = last * 3.5;
-        // Subtle stereo variation
-        if(ch === 1) data[i] *= 0.95 + Math.random() * 0.1;
-      }
-    }
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.loop = true;
+  stop(){ this._fadeOut(); this.current = 'off'; },
 
-    // Bandpass filter for rain character
-    const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 800;
-    bp.Q.value = 0.5;
-
-    // High shelf for crispness
-    const hs = ctx.createBiquadFilter();
-    hs.type = 'highshelf';
-    hs.frequency.value = 3000;
-    hs.gain.value = 4;
-
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.7, ctx.currentTime + this.fadeTime);
-
-    src.connect(bp).connect(hs).connect(gain).connect(this.master);
-    src.start();
-    this.nodes.push({source: src, gain: gain});
-
-    // Layer 2: high frequency patter (light rain texture)
-    const buf2 = ctx.createBuffer(2, len, ctx.sampleRate);
-    for(let ch = 0; ch < 2; ch++){
-      const d = buf2.getChannelData(ch);
-      for(let i = 0; i < len; i++){
-        d[i] = (Math.random() * 2 - 1) * (Math.random() < 0.3 ? 0.4 : 0.05);
-      }
-    }
-    const src2 = ctx.createBufferSource();
-    src2.buffer = buf2;
-    src2.loop = true;
-    const hp = ctx.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 4000;
-    const g2 = ctx.createGain();
-    g2.gain.setValueAtTime(0, ctx.currentTime);
-    g2.gain.linearRampToValueAtTime(0.25, ctx.currentTime + this.fadeTime);
-    src2.connect(hp).connect(g2).connect(this.master);
-    src2.start();
-    this.nodes.push({source: src2, gain: g2});
+  setVolume(v){
+    this.volume = v;
+    if(this.audio && !this._fadeTimer) this.audio.volume = v;
   },
 
-  // === OCEAN: modulated noise with slow LFO for wave rhythm ===
-  ocean(){
-    const ctx = this.ctx;
-    const len = ctx.sampleRate * 8;
-    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-    for(let ch = 0; ch < 2; ch++){
-      const d = buf.getChannelData(ch);
-      let last = 0;
-      for(let i = 0; i < len; i++){
-        const w = Math.random() * 2 - 1;
-        last = (last + 0.015 * w) / 1.015;
-        // Wave envelope
-        const t = i / ctx.sampleRate;
-        const wave = 0.4 + 0.6 * Math.pow(Math.sin(t * Math.PI * 2 / 6.5) * 0.5 + 0.5, 1.5);
-        d[i] = last * 4 * wave;
-        if(ch === 1){
-          const wave2 = 0.4 + 0.6 * Math.pow(Math.sin((t + 1.2) * Math.PI * 2 / 7.3) * 0.5 + 0.5, 1.5);
-          d[i] = last * 4 * wave2;
-        }
-      }
-    }
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.loop = true;
-
-    const lp = ctx.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 600;
-    lp.Q.value = 0.3;
-
-    // Slow LFO on filter frequency for wave movement
-    const lfo = ctx.createOscillator();
-    const lfoGain = ctx.createGain();
-    lfo.frequency.value = 0.08; // Very slow wave
-    lfoGain.gain.value = 300;
-    lfo.connect(lfoGain).connect(lp.frequency);
-    lfo.start();
-
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.65, ctx.currentTime + this.fadeTime);
-
-    src.connect(lp).connect(gain).connect(this.master);
-    src.start();
-    this.nodes.push({source: src, gain: gain});
-    this.nodes.push({source: lfo, gain: lfoGain});
-
-    // Subtle high-freq foam
-    const buf2 = ctx.createBuffer(1, ctx.sampleRate * 6, ctx.sampleRate);
-    const d2 = buf2.getChannelData(0);
-    for(let i = 0; i < d2.length; i++){
-      const t = i / ctx.sampleRate;
-      const env = Math.pow(Math.max(0, Math.sin(t * Math.PI * 2 / 6.5)), 3);
-      d2[i] = (Math.random() * 2 - 1) * env * 0.3;
-    }
-    const src2 = ctx.createBufferSource();
-    src2.buffer = buf2;
-    src2.loop = true;
-    const hp = ctx.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 2000;
-    const g2 = ctx.createGain();
-    g2.gain.setValueAtTime(0, ctx.currentTime);
-    g2.gain.linearRampToValueAtTime(0.2, ctx.currentTime + this.fadeTime);
-    src2.connect(hp).connect(g2).connect(this.master);
-    src2.start();
-    this.nodes.push({source: src2, gain: g2});
+  _fadeIn(a){
+    clearInterval(this._fadeTimer);
+    const step = 40;
+    const inc = this.volume / (this.fadeMs / step);
+    let vol = 0;
+    this._fadeTimer = setInterval(() => {
+      vol = Math.min(vol + inc, this.volume);
+      try{ a.volume = vol; }catch(e){}
+      if(vol >= this.volume){ clearInterval(this._fadeTimer); this._fadeTimer = null; }
+    }, step);
   },
 
-  // === NIGHT: cricket chirps + gentle wind ===
-  night(){
-    const ctx = this.ctx;
-
-    // Base: very gentle brown noise (wind)
-    const len = ctx.sampleRate * 5;
-    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-    for(let ch = 0; ch < 2; ch++){
-      const d = buf.getChannelData(ch);
-      let last = 0;
-      for(let i = 0; i < len; i++){
-        last = (last + 0.008 * (Math.random() * 2 - 1)) / 1.008;
-        const t = i / ctx.sampleRate;
-        const gust = 0.6 + 0.4 * Math.sin(t * Math.PI * 2 / 4.2 + ch * 0.8);
-        d[i] = last * 2.5 * gust;
+  _fadeOut(cb){
+    clearInterval(this._fadeTimer);
+    this._fadeTimer = null;
+    if(!this.audio || this.audio.paused){
+      if(this.audio){ this.audio.pause(); this.audio.src = ''; this.audio = null; }
+      if(cb) cb();
+      return;
+    }
+    const old = this.audio;
+    this.audio = null;
+    const step = 40;
+    const dec = old.volume / (this.fadeMs / step) || 0.02;
+    let vol = old.volume;
+    this._fadeTimer = setInterval(() => {
+      vol = Math.max(vol - dec, 0);
+      try{ old.volume = vol; }catch(e){}
+      if(vol <= 0){
+        clearInterval(this._fadeTimer);
+        this._fadeTimer = null;
+        old.pause();
+        old.src = '';
+        if(cb) cb();
       }
-    }
-    const windSrc = ctx.createBufferSource();
-    windSrc.buffer = buf;
-    windSrc.loop = true;
-    const windLp = ctx.createBiquadFilter();
-    windLp.type = 'lowpass';
-    windLp.frequency.value = 400;
-    const windG = ctx.createGain();
-    windG.gain.setValueAtTime(0, ctx.currentTime);
-    windG.gain.linearRampToValueAtTime(0.35, ctx.currentTime + this.fadeTime);
-    windSrc.connect(windLp).connect(windG).connect(this.master);
-    windSrc.start();
-    this.nodes.push({source: windSrc, gain: windG});
-
-    // Cricket layer: high-freq oscillators with rhythmic envelope
-    const cLen = ctx.sampleRate * 6;
-    const cBuf = ctx.createBuffer(2, cLen, ctx.sampleRate);
-    for(let ch = 0; ch < 2; ch++){
-      const d = cBuf.getChannelData(ch);
-      const baseFreq = 4200 + ch * 300 + Math.random() * 400;
-      const chirpRate = 11 + Math.random() * 4; // chirps per second
-      for(let i = 0; i < cLen; i++){
-        const t = i / ctx.sampleRate;
-        // Cricket chirp envelope
-        const chirpPhase = (t * chirpRate) % 1;
-        const env = chirpPhase < 0.15 ? Math.sin(chirpPhase / 0.15 * Math.PI) : 0;
-        // Slightly detuned pair
-        const sig = Math.sin(t * baseFreq * Math.PI * 2) * 0.5 +
-                    Math.sin(t * (baseFreq + 15) * Math.PI * 2) * 0.5;
-        // Random gaps (crickets pause)
-        const sec = Math.floor(t);
-        const active = ((sec * 7 + ch * 3) % 5) < 3;
-        d[i] = sig * env * (active ? 0.08 : 0) * (0.8 + 0.2 * Math.sin(t * 0.3));
-      }
-    }
-    const cSrc = ctx.createBufferSource();
-    cSrc.buffer = cBuf;
-    cSrc.loop = true;
-    const cG = ctx.createGain();
-    cG.gain.setValueAtTime(0, ctx.currentTime);
-    cG.gain.linearRampToValueAtTime(0.45, ctx.currentTime + this.fadeTime);
-    cSrc.connect(cG).connect(this.master);
-    cSrc.start();
-    this.nodes.push({source: cSrc, gain: cG});
-  },
-
-  // === LOFI: warm drone pad + subtle rhythmic pulse ===
-  lofi(){
-    const ctx = this.ctx;
-
-    // Warm pad: stacked detuned sine waves
-    const padNotes = [110, 164.81, 220, 329.63]; // Am chord tones
-    padNotes.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      // Slight vibrato
-      const vibLfo = ctx.createOscillator();
-      const vibG = ctx.createGain();
-      vibLfo.frequency.value = 0.3 + idx * 0.1;
-      vibG.gain.value = freq * 0.003;
-      vibLfo.connect(vibG).connect(osc.frequency);
-      vibLfo.start();
-
-      const g = ctx.createGain();
-      g.gain.setValueAtTime(0, ctx.currentTime);
-      const targetVol = idx === 0 ? 0.12 : idx === 2 ? 0.1 : 0.06;
-      g.gain.linearRampToValueAtTime(targetVol, ctx.currentTime + this.fadeTime);
-
-      const lp = ctx.createBiquadFilter();
-      lp.type = 'lowpass';
-      lp.frequency.value = 800 - idx * 100;
-
-      osc.connect(lp).connect(g).connect(this.master);
-      osc.start();
-      this.nodes.push({source: osc, gain: g});
-      this.nodes.push({source: vibLfo, gain: vibG});
-    });
-
-    // Subtle vinyl crackle
-    const crLen = ctx.sampleRate * 3;
-    const crBuf = ctx.createBuffer(1, crLen, ctx.sampleRate);
-    const crD = crBuf.getChannelData(0);
-    for(let i = 0; i < crLen; i++){
-      crD[i] = Math.random() < 0.002 ? (Math.random() * 2 - 1) * 0.5 :
-               (Math.random() * 2 - 1) * 0.005;
-    }
-    const crSrc = ctx.createBufferSource();
-    crSrc.buffer = crBuf;
-    crSrc.loop = true;
-    const crHp = ctx.createBiquadFilter();
-    crHp.type = 'highpass';
-    crHp.frequency.value = 1000;
-    const crG = ctx.createGain();
-    crG.gain.setValueAtTime(0, ctx.currentTime);
-    crG.gain.linearRampToValueAtTime(0.15, ctx.currentTime + this.fadeTime);
-    crSrc.connect(crHp).connect(crG).connect(this.master);
-    crSrc.start();
-    this.nodes.push({source: crSrc, gain: crG});
-
-    // Slow rhythmic pulse (like a distant heartbeat / lo-fi beat)
-    const pLen = ctx.sampleRate * 4;
-    const pBuf = ctx.createBuffer(1, pLen, ctx.sampleRate);
-    const pD = pBuf.getChannelData(0);
-    const bpm = 70;
-    const beatSamples = Math.floor(ctx.sampleRate * 60 / bpm);
-    for(let i = 0; i < pLen; i++){
-      const inBeat = i % beatSamples;
-      const beatT = inBeat / ctx.sampleRate;
-      // Soft kick: low freq sine with quick decay
-      const kickEnv = Math.exp(-beatT * 8);
-      const kick = Math.sin(beatT * 55 * Math.PI * 2) * kickEnv * 0.3;
-      pD[i] = kick;
-    }
-    const pSrc = ctx.createBufferSource();
-    pSrc.buffer = pBuf;
-    pSrc.loop = true;
-    const pLp = ctx.createBiquadFilter();
-    pLp.type = 'lowpass';
-    pLp.frequency.value = 120;
-    const pG = ctx.createGain();
-    pG.gain.setValueAtTime(0, ctx.currentTime);
-    pG.gain.linearRampToValueAtTime(0.3, ctx.currentTime + this.fadeTime);
-    pSrc.connect(pLp).connect(pG).connect(this.master);
-    pSrc.start();
-    this.nodes.push({source: pSrc, gain: pG});
+    }, step);
   }
 };
 
 let ambPanelOpen = false;
 function toggleAmbPanel(){
-  AMB.init();
-  AMB.resume();
   ambPanelOpen = !ambPanelOpen;
   document.getElementById('ambPanel').classList.toggle('open', ambPanelOpen);
 }
@@ -3686,34 +3460,22 @@ document.addEventListener('click', e => {
 });
 
 function setAmbient(type){
-  AMB.init();
-  AMB.resume();
-
-  // Stop current
-  if(AMB.nodes.length) AMB.stop();
-
-  AMB.current = type;
-
   // Update UI
   document.querySelectorAll('.amb-opt').forEach(el => {
     el.classList.toggle('selected', el.dataset.sound === type);
   });
   document.getElementById('ambBtn').classList.toggle('active', type !== 'off');
 
-  // Start new
-  if(type === 'rain') AMB.rain();
-  else if(type === 'ocean') AMB.ocean();
-  else if(type === 'night') AMB.night();
-  else if(type === 'lofi') AMB.lofi();
+  // Play or stop
+  AMB.play(type);
 
   // Save preference
   try{ localStorage.setItem('dashu_ambient', type); }catch(e){}
+  // Migrate old 'lofi' preference to 'healing'
 }
 
 function setAmbVolume(val){
-  AMB.init();
-  AMB.volume = val / 100;
-  if(AMB.master) AMB.master.gain.value = AMB.volume;
+  AMB.setVolume(val / 100);
   try{ localStorage.setItem('dashu_amb_vol', val); }catch(e){}
 }
 
@@ -3726,21 +3488,17 @@ function setAmbVolume(val){
       AMB.volume = parseInt(vol) / 100;
       document.getElementById('ambVol').value = vol;
     }
-    if(saved && saved !== 'off'){
+    // Migrate old 'lofi' to 'healing'
+    const mapped = saved === 'lofi' ? 'healing' : saved;
+    if(mapped && mapped !== 'off'){
       // Mark UI as selected but don't auto-play (needs user gesture)
       document.querySelectorAll('.amb-opt').forEach(el => {
-        el.classList.toggle('selected', el.dataset.sound === saved);
+        el.classList.toggle('selected', el.dataset.sound === mapped);
       });
       document.getElementById('ambBtn').classList.add('active');
       // Auto-play on first user interaction
       const autoStart = () => {
-        AMB.init();
-        AMB.resume();
-        AMB.current = saved;
-        if(saved === 'rain') AMB.rain();
-        else if(saved === 'ocean') AMB.ocean();
-        else if(saved === 'night') AMB.night();
-        else if(saved === 'lofi') AMB.lofi();
+        AMB.play(mapped);
         document.removeEventListener('click', autoStart);
         document.removeEventListener('touchstart', autoStart);
       };
