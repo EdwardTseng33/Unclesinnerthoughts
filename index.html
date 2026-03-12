@@ -67,7 +67,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 .scene{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;
   display:flex;flex-direction:column;align-items:center;
   justify-content:flex-start;
-  padding-top:calc(26vh + 230px);
+  padding-top:calc(30vh + 230px);
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
   opacity:0;pointer-events:none;transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1)}
@@ -76,7 +76,7 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 
 /* ===== PERSISTENT ORB ANCHOR (fixed position across all scenes) ===== */
 .orb-anchor{
-  position:absolute;top:26vh;left:50%;transform:translateX(-50%);
+  position:absolute;top:30vh;left:50%;transform:translateX(-50%);
   z-index:3;pointer-events:none;overflow:visible;background:transparent;
   transition:opacity 1.2s cubic-bezier(0.4,0,0.2,1)}
 .orb-anchor .orb-space{pointer-events:auto}
@@ -508,13 +508,13 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 /* ===== MOBILE RESPONSIVE ===== */
 @media(max-width:430px){
   /* Smaller orb on mobile */
-  .orb-anchor{top:21vh}
+  .orb-anchor{top:25vh}
   .orb-space{width:170px;height:170px}
   .orb-core{width:125px;height:125px}
   .orb-glow{width:155px;height:155px}
   .orb-halo{width:210px;height:210px}
   /* Adjust scene padding to match smaller orb */
-  .scene{padding-top:calc(21vh + 175px)}
+  .scene{padding-top:calc(25vh + 175px)}
   /* Tighter voice text */
   .voice-text{font-size:0.98rem;line-height:1.85;max-width:300px}
   .voice-area{padding:0 1.5rem}
@@ -554,12 +554,12 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 
 /* Extra small screens (iPhone SE, etc.) */
 @media(max-width:375px){
-  .orb-anchor{top:16vh}
+  .orb-anchor{top:20vh}
   .orb-space{width:150px;height:150px}
   .orb-core{width:110px;height:110px}
   .orb-glow{width:140px;height:140px}
   .orb-halo{width:185px;height:185px}
-  .scene{padding-top:calc(16vh + 155px)}
+  .scene{padding-top:calc(20vh + 155px)}
   .voice-text{font-size:0.92rem;line-height:1.8}
   #splash .splash-title{font-size:1.5rem}
   #splash .splash-sub{font-size:0.85rem;max-width:250px}
@@ -568,12 +568,12 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 
 /* Short screens (landscape or very short phones) */
 @media(max-height:700px){
-  .orb-anchor{top:12vh}
+  .orb-anchor{top:15vh}
   .orb-space{width:140px;height:140px}
   .orb-core{width:105px;height:105px}
   .orb-glow{width:130px;height:130px}
   .orb-halo{width:175px;height:175px}
-  .scene{padding-top:calc(12vh + 145px)}
+  .scene{padding-top:calc(15vh + 145px)}
   .voice-text{font-size:0.9rem;line-height:1.75}
   .choice-pill{padding:0.6rem 1rem;font-size:0.85rem}
   .choices-ring{gap:6px}
