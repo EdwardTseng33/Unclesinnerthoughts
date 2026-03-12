@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>大叔心聲</title>
 <meta name="description" content="不用掛號、不用預約、不用假裝沒事。給 30-50 歲台灣大叔的深夜樹洞。">
 <meta name="theme-color" content="#0a0b10">
@@ -582,24 +582,23 @@ canvas#cosmos{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 }
 
 /* ===== PWA STANDALONE COMPENSATION ===== */
-/* In standalone mode, no address bar means viewport is taller.
-   svh still reports larger values, so orb drifts down.
-   Reduce top values by ~3svh to match browser visual position. */
+/* In standalone mode, svh = full screen (no address bar), so svh-based
+   positions drift down. Use fixed px + safe-area-inset for consistency. */
 @media(display-mode:standalone){
-  .orb-anchor{top:23svh}
-  .scene{padding-top:calc(23svh + 230px)}
+  .orb-anchor{top:calc(env(safe-area-inset-top,0px) + 160px)}
+  .scene{padding-top:calc(env(safe-area-inset-top,0px) + 390px)}
 }
 @media(display-mode:standalone) and (max-width:430px){
-  .orb-anchor{top:18svh}
-  .scene{padding-top:calc(18svh + 175px)}
+  .orb-anchor{top:calc(env(safe-area-inset-top,0px) + 120px)}
+  .scene{padding-top:calc(env(safe-area-inset-top,0px) + 295px)}
 }
 @media(display-mode:standalone) and (max-width:375px){
-  .orb-anchor{top:13svh}
-  .scene{padding-top:calc(13svh + 155px)}
+  .orb-anchor{top:calc(env(safe-area-inset-top,0px) + 90px)}
+  .scene{padding-top:calc(env(safe-area-inset-top,0px) + 245px)}
 }
 @media(display-mode:standalone) and (max-height:700px){
-  .orb-anchor{top:9svh}
-  .scene{padding-top:calc(9svh + 145px)}
+  .orb-anchor{top:calc(env(safe-area-inset-top,0px) + 60px)}
+  .scene{padding-top:calc(env(safe-area-inset-top,0px) + 205px)}
 }
 
 /* ===== BURN-IT OVERLAY (文字銷毀紓壓) ===== */
@@ -3386,7 +3385,7 @@ const AMB = {
     const now = this.ctx.currentTime;
     this.nodes.forEach(n => {
       try{
-        if(n.gain) n.gain.gain.linearRampToValueAtTime(0, now + this.fadeTime);
+        if(n.gain){ n.gain.gain.setValueAtTime(n.gain.gain.value, now); n.gain.gain.linearRampToValueAtTime(0, now + this.fadeTime); }
         setTimeout(() => { try{ n.source.stop(); }catch(e){} }, this.fadeTime * 1000 + 100);
       }catch(e){}
     });
@@ -3427,7 +3426,7 @@ const AMB = {
     hs.gain.value = 4;
 
     const gain = ctx.createGain();
-    gain.gain.value = 0;
+    gain.gain.setValueAtTime(0, ctx.currentTime);
     gain.gain.linearRampToValueAtTime(0.7, ctx.currentTime + this.fadeTime);
 
     src.connect(bp).connect(hs).connect(gain).connect(this.master);
@@ -3449,7 +3448,7 @@ const AMB = {
     hp.type = 'highpass';
     hp.frequency.value = 4000;
     const g2 = ctx.createGain();
-    g2.gain.value = 0;
+    g2.gain.setValueAtTime(0, ctx.currentTime);
     g2.gain.linearRampToValueAtTime(0.25, ctx.currentTime + this.fadeTime);
     src2.connect(hp).connect(g2).connect(this.master);
     src2.start();
@@ -3495,7 +3494,7 @@ const AMB = {
     lfo.start();
 
     const gain = ctx.createGain();
-    gain.gain.value = 0;
+    gain.gain.setValueAtTime(0, ctx.currentTime);
     gain.gain.linearRampToValueAtTime(0.65, ctx.currentTime + this.fadeTime);
 
     src.connect(lp).connect(gain).connect(this.master);
@@ -3518,7 +3517,7 @@ const AMB = {
     hp.type = 'highpass';
     hp.frequency.value = 2000;
     const g2 = ctx.createGain();
-    g2.gain.value = 0;
+    g2.gain.setValueAtTime(0, ctx.currentTime);
     g2.gain.linearRampToValueAtTime(0.2, ctx.currentTime + this.fadeTime);
     src2.connect(hp).connect(g2).connect(this.master);
     src2.start();
@@ -3549,7 +3548,7 @@ const AMB = {
     windLp.type = 'lowpass';
     windLp.frequency.value = 400;
     const windG = ctx.createGain();
-    windG.gain.value = 0;
+    windG.gain.setValueAtTime(0, ctx.currentTime);
     windG.gain.linearRampToValueAtTime(0.35, ctx.currentTime + this.fadeTime);
     windSrc.connect(windLp).connect(windG).connect(this.master);
     windSrc.start();
@@ -3580,7 +3579,7 @@ const AMB = {
     cSrc.buffer = cBuf;
     cSrc.loop = true;
     const cG = ctx.createGain();
-    cG.gain.value = 0;
+    cG.gain.setValueAtTime(0, ctx.currentTime);
     cG.gain.linearRampToValueAtTime(0.45, ctx.currentTime + this.fadeTime);
     cSrc.connect(cG).connect(this.master);
     cSrc.start();
@@ -3606,7 +3605,7 @@ const AMB = {
       vibLfo.start();
 
       const g = ctx.createGain();
-      g.gain.value = 0;
+      g.gain.setValueAtTime(0, ctx.currentTime);
       const targetVol = idx === 0 ? 0.12 : idx === 2 ? 0.1 : 0.06;
       g.gain.linearRampToValueAtTime(targetVol, ctx.currentTime + this.fadeTime);
 
@@ -3635,7 +3634,7 @@ const AMB = {
     crHp.type = 'highpass';
     crHp.frequency.value = 1000;
     const crG = ctx.createGain();
-    crG.gain.value = 0;
+    crG.gain.setValueAtTime(0, ctx.currentTime);
     crG.gain.linearRampToValueAtTime(0.15, ctx.currentTime + this.fadeTime);
     crSrc.connect(crHp).connect(crG).connect(this.master);
     crSrc.start();
@@ -3662,7 +3661,7 @@ const AMB = {
     pLp.type = 'lowpass';
     pLp.frequency.value = 120;
     const pG = ctx.createGain();
-    pG.gain.value = 0;
+    pG.gain.setValueAtTime(0, ctx.currentTime);
     pG.gain.linearRampToValueAtTime(0.3, ctx.currentTime + this.fadeTime);
     pSrc.connect(pLp).connect(pG).connect(this.master);
     pSrc.start();
